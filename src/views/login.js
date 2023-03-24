@@ -5,12 +5,14 @@ import React from 'react';
 import {View, Text} from 'react-native';
 import {Button, Input} from 'native-base';
 import { NativeBaseProvider, Link} from 'native-base';
+import { useNavigation } from '@react-navigation/native';
 //import Sidebar from '../components/sidebar';
 import AppBar from '../components/nav';
 //import { Image } from 'react-native';
 
 
 function LoginScreen() {
+  const navigation = useNavigation();
   return (
     <NativeBaseProvider>
       <AppBar />
@@ -25,11 +27,11 @@ function LoginScreen() {
           <View style={{ width: '100%', paddingHorizontal: 20, marginBottom: 10 }}>
             <Input variant="underlined" placeholder="Senha" />
             <Text style={{ textAlign: 'right', marginTop: 5 }}>
-              <Link href="/cadastroUser" style={{ color: 'grey' }}>Cadastre-se aqui</Link>
+              <Link style={{ color: 'grey' }} onPress={()=>{navigation.navigate("Cadastro")}} >Cadastre-se aqui</Link>
             </Text>
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginTop: 20 }}>
-            <Button size="lg" colorScheme="blue" style={{ marginBottom: 10 }}>Login</Button>
+            <Button size="lg" onPress={()=>{navigation.navigate("CadastroDespesa")}} colorScheme="blue" style={{ marginBottom: 10 }}>Login</Button>
             <Button size="lg" style={{ marginBottom: 10 }}>Login com Google</Button>
           </View>
         </View>
