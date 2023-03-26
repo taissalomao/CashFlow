@@ -5,14 +5,11 @@ import React from 'react';
 import {View} from 'react-native';
 import {Button, Input, Select, Text} from 'native-base';
 import { NativeBaseProvider} from 'native-base';
-import AppBar from '../components/nav';
-
 
 
 function CadastroDespesaScreen ( ){
   return (
     <NativeBaseProvider>
-      <AppBar />
       <View style={{ flex: 1, backgroundColor: '#EAF0F7', justifyContent: 'center' }}>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
             <Text fontSize="lg" style={{marginBottom: 10 }}>Cadastre a despesa</Text>
@@ -35,9 +32,6 @@ function CadastroDespesaScreen ( ){
                     <Select.Item label="Telefone" value="Telefone" />
                     <Select.Item label="Internet" value="Internet" />
                 </Select>
-          </View>
-          <View style={{ width: '100%', paddingHorizontal: 20, marginBottom: 10 }}>
-            <Input variant="outline" placeholder="Confirme a senha"/>
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginTop: 20 }}>
             <Button size="md" colorScheme="blue" style={{ marginBottom: 10 }}>Salvar</Button>
