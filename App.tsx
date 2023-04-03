@@ -3,7 +3,7 @@
  /* eslint-disable prettier/prettier */
 
 import React from 'react';
-import "./src/config/config.js"
+import "./src/config/config"
 import { NativeBaseProvider} from 'native-base';
 import  { Routes }  from './src/routes/index';
 import { NavigationContainer } from '@react-navigation/native';;
