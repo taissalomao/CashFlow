@@ -1,105 +1,151 @@
 /* eslint-disable prettier/prettier */
+/* eslint-disable react/self-closing-comp */
+/* eslint-disable prettier/prettier */
+/* eslint-disable prettier/prettier */
 import React from 'react';
-import {View} from 'react-native';
-import { NativeBaseProvider } from 'native-base';
-//import Sidebar from '../components/sidebar';
-
-import { Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import { Button, NativeBaseProvider } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 
 
-function HomeScreen() {
-  const navigation = useNavigation();
-  return (
+function HomeScreen(/* { username } */) {
 
+  const navigation = useNavigation();
+
+  return (
     <NativeBaseProvider>
-{/*         <Sidebar/> */}
-      <View style={styles.container}>
-        <View style={styles.header}>
-          <View style={styles.logoContainer}>
-            <Image source={require('../assets/images/logo.png')} style={styles.logo} />
-            <Text style={styles.title}>CashFlow</Text>
-          </View>
+      <View style={styles.wrapper}>
+{/*          <Text style={styles.buttonTexto}>Bem vindo{username}</Text> */}
+        <View style={styles.container}>
+          <Text style={styles.username}>Bem vindo{/* {username} */}</Text>
+        </View>
+        <View style={styles.overlay}>
         </View>
         <View style={styles.content}>
-          <Text style={styles.welcome}>Bem-vindo(a) ao CashFlow!</Text>
-          <Text style={styles.description}>Aqui você pode gerenciar suas finanças de forma fácil e intuitiva.</Text>
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Despesas')}>
-            <Text style={styles.buttonText}>Ver Despesas</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.buttonContainer} onPress={() => navigation.navigate('Receitas')}>
-            <Text style={styles.buttonText}>Ver Receitas</Text>
-          </TouchableOpacity>
+          <Text style={styles.texto}>Saldo</Text>
+          <Text style={styles.texto}>R$ 0,00</Text>
+          <Button style={styles.buttonReceita}
+          onPress={()=>{navigation.navigate('Despesas');}}>
+            <Text style={styles.buttonTexto}>Adicionar Receita</Text>
+          </Button>
         </View>
+        <View style={styles.overlay2}>
       </View>
+      <View style={styles.content2}>
+        <Text style={styles.texto}>Despesas</Text>
+        <Text style={styles.texto}>R$ 0,00</Text>
+        <Button style={styles.buttonDespesa}
+            onPress={()=>{navigation.navigate('CadastroDespesa');}}>
+          <Text style={styles.buttonTexto}>Adicionar Despesa</Text>
+        </Button>
+      </View>
+      <View>
+        <Button style={styles.buttonProfile}
+            onPress={()=>{navigation.navigate('CadastroDespesa');}}>
+          <Text style={styles.buttonTexto}>Meu perfil</Text>
+        </Button>
+      </View>
+      </View>
+
 
     </NativeBaseProvider>
   );
 }
 
+export default HomeScreen;
+
 const styles = StyleSheet.create({
-  container: {
+  wrapper: {
+    position: 'relative',
     flex: 1,
-    backgroundColor: '#EAF0F7',
-    paddingTop: 20,
+    backgroundColor: '#e8e9eb', //fundo aqui
   },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+  container: {
+    paddingTop: 80,
     paddingHorizontal: 20,
-    marginBottom: 20,
-  },
-  logoContainer: {
-    flexDirection: 'row',
+    backgroundColor: '#3005f2',
     alignItems: 'center',
+    justifyContent: 'center',
   },
-  logo: {
-    width: 40,
-    height: 40,
-    marginRight: 10,
-  },
-  title: {
-    fontSize: 20,
+  username: {
+    color: '#fff',
+    fontSize: 24,
     fontWeight: 'bold',
-    color: '#0092b3',
+    marginTop: 10,
   },
-  menuIcon: {
-    marginLeft: 10,
+  overlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 16,
+    margin: 24,
+    height: 200,
+    marginTop: 80,
+    boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #f8f8f8',
   },
   content: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
+    margin: 32,
   },
-  welcome: {
-    fontSize: 24,
+  content2: {
+    margin: 32,
+  },
+  overlay2: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: '#f8f8f8',
+    borderRadius: 16,
+    margin: 24,
+    height: 200,
+    marginTop: 300,
+    boxShadow: '0px 8px 8px rgba(0, 0, 0, 0.1)',
+    border: '1px solid #f8f8f8',
+  },
+  buttonReceita: {
+    backgroundColor: '#79d6f7',
+    marginTop: 10,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 50,
+    borderRadius: 16,
+  },
+  buttonDespesa: {
+    backgroundColor: '#79d6f7',
+    marginTop: 50,
+    marginLeft: 10,
+    marginRight: 10,
+    marginBottom: 50,
+    borderRadius: 16,
+  },
+  buttonTexto: {
+    color: '#1348cf',
     fontWeight: 'bold',
-    marginBottom: 10,
-    textAlign: 'center',
-    color: '#0092b3',
   },
-  description: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-    color: '#6B6B6B',
-  },
-  buttonContainer: {
-    width: '100%',
-    backgroundColor: '#0092b3',
-    paddingVertical: 15,
-    borderRadius: 5,
-    marginBottom: 10,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: 'white',
+  texto: {
+    color: '#1348cf',
     fontWeight: 'bold',
-    fontSize: 16,
+    fontSize: 10,
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  buttonProfile: {
+    backgroundColor: '#79d6f7',
+    marginTop: 10,
+    marginLeft: 25,
+    marginRight: 25,
+    marginBottom: 50,
+    borderRadius: 16,
+  },
+  welcomeTexto: {
+    backgroundColor: '#79d6f7',
+    color: '#1348cf',
+    fontWeight: 'bold',
   },
 });
-
-export default HomeScreen;
-
