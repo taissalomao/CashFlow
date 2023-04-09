@@ -25,7 +25,7 @@ function HomeScreen(/* { username } */) {
           <Text style={styles.texto}>Saldo</Text>
           <Text style={styles.texto}>R$ 0,00</Text>
           <Button style={styles.buttonReceita}
-          onPress={()=>{navigation.navigate('Despesas');}}>
+          onPress={()=>{navigation.navigate('CadastroReceita');}}>
             <Text style={styles.buttonTexto}>Adicionar Receita</Text>
           </Button>
         </View>
@@ -46,8 +46,6 @@ function HomeScreen(/* { username } */) {
         </Button>
       </View>
       </View>
-
-
     </NativeBaseProvider>
   );
 }

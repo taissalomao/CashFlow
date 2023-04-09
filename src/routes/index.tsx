@@ -11,6 +11,8 @@ import CadastroDespesaScreen from "../views/cadastroDespesa";
 import InitialScreen from "../views/paginaInicial";
 import HomeScreen from "../views/home";
 import ListagemDespesaScreen from "../views/listaDespesas";
+import CadastroReceitaScreen from "../views/cadastroReceita";
+import ListagemReceitaScreen from "../views/listaReceitas";
 
 const Routes: React.FC = () =>{
     return (
@@ -20,7 +22,9 @@ const Routes: React.FC = () =>{
             <Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
             <Screen name="Cadastro" component={CadastroScreen} options={{ headerShown: false }} />
             <Screen name="CadastroDespesa" component={CadastroDespesaScreen} options={{ headerShown: false }}/>
+            <Screen name="CadastroReceita" component={CadastroReceitaScreen} options={{ headerShown: false }}/>
             <Screen name="Despesas" component={ListagemDespesaScreen} options={{ headerShown: false }}/>
+            <Screen name="Receitas" component={ListagemReceitaScreen} options={{ headerShown: false }}/>
         </Navigator>
     );
 };

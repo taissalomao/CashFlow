@@ -3,34 +3,46 @@
 /* eslint-disable prettier/prettier */
 import React from 'react';
 import {View} from 'react-native';
-import {Button, Input, Text} from 'native-base';
+import {Button, Input, Select, Text} from 'native-base';
 import { NativeBaseProvider} from 'native-base';
-import AppBar from '../components/nav';
+import { useNavigation } from '@react-navigation/native';
 
 
-function CadastroScreen ( ){
+function CadastroReceitaScreen ( ){
+
+const navigation = useNavigation();
+
   return (
     <NativeBaseProvider>
-      <AppBar />
       <View style={{ flex: 1, backgroundColor: '#EAF0F7', justifyContent: 'center' }}>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
-            <Text fontSize="lg" style={{marginBottom: 10 }}>Cadastro de usuário</Text>
+            <Text fontSize="lg" style={{marginBottom: 10 }}>Cadastre a Receita</Text>
         </View>
         <View style={{ justifyContent: 'center', alignItems: 'center' }}>
           <View style={{ width: '100%', paddingHorizontal: 20, marginBottom: 10 }}>
             <Input variant="outline" placeholder="Nome"/>
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginBottom: 10 }}>
-            <Input variant="outline" placeholder="Nome de usuário"/>
+            <Input variant="outline" placeholder="Descrição"/>
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginBottom: 10 }}>
-            <Input variant="outline" placeholder="Senha"/>
+            <Input variant="outline" placeholder="Valor R$"/>
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginBottom: 10 }}>
-            <Input variant="outline" placeholder="Confirme a senha"/>
+                <Select minWidth="200" accessibilityLabel="Choose Service" placeholder="Categoria">
+                    <Select.Item label="Aluguel" value="Aluguel" />
+                    <Select.Item label="Água" value="Água" />
+                    <Select.Item label="Luz" value="Luz" />
+                    <Select.Item label="Telefone" value="Telefone" />
+                    <Select.Item label="Internet" value="Internet" />
+                </Select>
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginTop: 20 }}>
             <Button size="md" colorScheme="blue" style={{ marginBottom: 10 }}>Salvar</Button>
+          </View>
+          <View style={{ width: '100%', paddingHorizontal: 20}}>
+            <Button size="md" colorScheme="blue" style={{ marginBottom: 10 }}
+            onPress={()=>{navigation.navigate('Receitas');}}>Minhas Receitas</Button>
           </View>
         </View>
       </View>
@@ -38,5 +50,4 @@ function CadastroScreen ( ){
   );
 }
 
-export default CadastroScreen;
-
+export default CadastroReceitaScreen;
