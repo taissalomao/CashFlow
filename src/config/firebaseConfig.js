@@ -1,8 +1,10 @@
 import { initializeApp } from "firebase/app";
-import{ getFirestore } from "firebase/firestore"
-import { getAuth } from "firebase/auth"
-import { getStorage } from "firebase/storage"
-import { getDatabase } from "firebase/database"
+import { getFirestore } from "firebase/firestore";
+import { getAuth } from "firebase/auth";
+import { getStorage } from "firebase/storage";
+import { getDatabase } from "firebase/database";
+
+// Firebase
 
 const firebaseConfig = {
   apiKey: "AIzaSyByCmvc8_ic-hRpUzyQATGIBPTKMijBAAw",
@@ -11,10 +13,12 @@ const firebaseConfig = {
   projectId: "cashflow-704f7",
   storageBucket: "cashflow-704f7.appspot.com",
   messagingSenderId: "772223170062",
-  appId: "1:772223170062:web:3b448908d06903480cee5f"
+  appId: "1:772223170062:web:d1d68c1846fc775c0cee5f"
 };
 
+
 const app = initializeApp(firebaseConfig);
+
 export const db = getFirestore(app);
 export const authFirebase = getAuth(app);
 export const storage = getStorage(app);

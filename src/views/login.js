@@ -15,7 +15,6 @@ function LoginScreen() {
   const navigation = useNavigation();
   return (
     <NativeBaseProvider>
-{/*       <AppBar /> */}
       <View style={{ backgroundColor: '#EAF0F7', justifyContent: 'center', flex: 1 }}>
         <View stlye= {{ justifyContent: 'center', alignItems: 'center' }}>
           <Image source={require('../assets/images/logo.png')} style={{width: 120, height: 130, alignSelf: 'center'}}/>
