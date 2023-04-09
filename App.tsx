@@ -4,6 +4,7 @@
 /* eslint-disable prettier/prettier */
 
 import React, { useEffect, useState } from 'react';
+import "./src/config/firebaseConfig.js"
 import { View } from 'react-native';
 import { Image } from 'react-native';
 //import LoginScreen from './src/components/login';
@@ -17,9 +18,7 @@ import { NavigationContainer } from '@react-navigation/native';
 
 function App() {
  
-
   return (
-
 
     <NativeBaseProvider>  
       <NavigationContainer>
