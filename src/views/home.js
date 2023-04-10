@@ -44,6 +44,10 @@ function HomeScreen(/* { username } */) {
             onPress={()=>{navigation.navigate('CadastroDespesa');}}>
           <Text style={styles.buttonTexto}>Meu perfil</Text>
         </Button>
+        <Button style={styles.buttonProfile}
+            onPress={()=>{navigation.navigate('Charts');}}>
+          <Text style={styles.buttonTexto}>Gráfico de Gastos</Text>
+        </Button>
       </View>
       </View>
     </NativeBaseProvider>
