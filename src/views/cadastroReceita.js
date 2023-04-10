@@ -52,11 +52,10 @@ function CadastroReceitaScreen() {
                 minWidth="200"
                 accessibilityLabel="Choose Service"
                 placeholder="Categoria" onChangeText={e => setReceita({...receita, categoria: e})}>
-                <Select.Item label="Aluguel" value="Aluguel" />
-                <Select.Item label="Água" value="Água" />
-                <Select.Item label="Luz" value="Luz" />
-                <Select.Item label="Telefone" value="Telefone" />
-                <Select.Item label="Internet" value="Internet" />
+                <Select.Item label="Salário" value="Salário" />
+                <Select.Item label="Investimento" value="Investimento" />
+                <Select.Item label="Apto Alugado" value="Apto Alugado" />
+                <Select.Item label="Pensão" value="Pensão" />
               </Select>
             </View>
             <View style={{width: '100%', paddingHorizontal: 20, marginTop: 20}}>
