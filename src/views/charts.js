@@ -1,3 +1,9 @@
+/* eslint-disable prettier/prettier */
+/* eslint-disable react-native/no-inline-styles */
+/* eslint-disable react/react-in-jsx-scope */
+/* eslint-disable quotes */
+/* eslint-disable no-unused-vars */
+/* eslint-disable prettier/prettier */
 import { View } from "native-base";
 import { Dimensions } from "react-native";
 import {
@@ -6,13 +12,14 @@ import {
     PieChart,
     ProgressChart,
     ContributionGraph,
-    StackedBarChart
+    StackedBarChart,
 } from "react-native-chart-kit";
 import { Text } from "react-native-svg";
 
 export default function ChartScreen() {
     return (
-        <View>
+        <>
+        <View style={{ backgroundColor: '#EAF0F7', justifyContent: 'flex-start', flex: 1, paddingLeft: 5, alignItems: 'center'}}>
             <Text>Bezier Line Chart</Text>
             <LineChart
                 data={{
@@ -25,10 +32,10 @@ export default function ChartScreen() {
                                 Math.random() * 100,
                                 Math.random() * 100,
                                 Math.random() * 100,
-                                Math.random() * 100
-                            ]
-                        }
-                    ]
+                                Math.random() * 100,
+                            ],
+                        },
+                    ],
                 }}
                 width={Dimensions.get("window").width} // from react-native
                 height={220}
@@ -43,20 +50,21 @@ export default function ChartScreen() {
                     color: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     labelColor: (opacity = 1) => `rgba(255, 255, 255, ${opacity})`,
                     style: {
-                        borderRadius: 16
+                        borderRadius: 16,
                     },
                     propsForDots: {
                         r: "6",
                         strokeWidth: "2",
-                        stroke: "#ffa726"
-                    }
+                        stroke: "#ffa726",
+                    },
                 }}
                 bezier
                 style={{
                     marginVertical: 8,
-                    borderRadius: 16
+                    borderRadius: 16,
                 }}
             />
         </View>
-    )
+        </>
+    );
 }

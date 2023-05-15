@@ -1,9 +1,9 @@
 /* eslint-disable quotes *//* eslint-disable prettier/prettier */
 import React from "react";
 
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+/* import { createNativeStackNavigator } from "@react-navigation/native-stack"; */
 
-const { Navigator, Screen} = createNativeStackNavigator();
+/* const {Screen} = createNativeStackNavigator(); */
 
 
 import { useAuthentication } from "../utils/authenticator";
@@ -13,7 +13,7 @@ import { InitialRoutes } from "./initial";
 const Routes: React.FC = () =>{
     const { user } = useAuthentication();
 
-    return user ? <AuthRoutes /> : <InitialRoutes />
+    return user ? <AuthRoutes /> : <InitialRoutes />;
 };
 
 export {Routes};

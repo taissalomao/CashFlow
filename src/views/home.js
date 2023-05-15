@@ -50,6 +50,15 @@ function HomeScreen(/* { username } */) {
             <Text style={styles.buttonTexto}>Meu perfil</Text>
           </Button>
         </View>
+        <View>
+          <Button
+            style={styles.buttonProfile}
+            onPress={() => {
+              navigation.navigate('Charts');
+            }}>
+            <Text style={styles.buttonTexto}>Meus relatórios</Text>
+          </Button>
+        </View>
       </View>
     </NativeBaseProvider>
   );
@@ -120,6 +129,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 50,
     borderRadius: 16,
+    height: 52,
   },
   buttonDespesa: {
     backgroundColor: '#79d6f7',
@@ -128,6 +138,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 50,
     borderRadius: 16,
+    height: 52,
   },
   buttonTexto: {
     color: '#1348cf',
@@ -143,8 +154,8 @@ const styles = StyleSheet.create({
   buttonProfile: {
     backgroundColor: '#79d6f7',
     marginTop: 10,
-    marginLeft: 25,
-    marginRight: 25,
+    marginLeft: 40,
+    marginRight: 40,
     marginBottom: 50,
     borderRadius: 16,
   },
