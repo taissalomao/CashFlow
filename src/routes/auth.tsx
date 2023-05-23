@@ -12,12 +12,14 @@ import ListagemDespesaScreen from "../views/listaDespesas";
 import CadastroReceitaScreen from "../views/cadastroReceita";
 import ListagemReceitaScreen from "../views/listaReceitas";
 import ChartScreen from "../views/charts";
+import LoginScreen from "../views/login";
+import CadastroScreen from "../views/cadastroUser";
 
 
 const AuthRoutes: React.FC = () =>{
     return (
-        <Navigator initialRouteName="Inicial">
-            <Screen name=" " component={InitialScreen} options={{ headerShown: false }}/>
+        <Navigator>
+            <Screen name="Inicial" component={InitialScreen} options={{ headerShown: false }}/>
             <Screen name="Home" component= {HomeScreen} options={{ headerShown: false }}/>
             <Screen name="CadastroDespesa" component={CadastroDespesaScreen} options={{ headerShown: false }}/>
             <Screen name="CadastroReceita" component={CadastroReceitaScreen} options={{ headerShown: false }}/>
