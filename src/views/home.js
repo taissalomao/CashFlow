@@ -3,48 +3,62 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable prettier/prettier */
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
-import { Button, NativeBaseProvider } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
-
+import {View, Text, StyleSheet} from 'react-native';
+import {Button, NativeBaseProvider} from 'native-base';
+import {useNavigation} from '@react-navigation/native';
 
 function HomeScreen(/* { username } */) {
-
   const navigation = useNavigation();
 
   return (
     <NativeBaseProvider>
       <View style={styles.wrapper}>
-{/*          <Text style={styles.buttonTexto}>Bem vindo{username}</Text> */}
+        {/*          <Text style={styles.buttonTexto}>Bem vindo{username}</Text> */}
         <View style={styles.container}>
           <Text style={styles.username}>Bem vindo{/* {username} */}</Text>
         </View>
-        <View style={styles.overlay}>
-        </View>
+        <View style={styles.overlay}></View>
         <View style={styles.content}>
           <Text style={styles.texto}>Saldo</Text>
           <Text style={styles.texto}>R$ 0,00</Text>
-          <Button style={styles.buttonReceita}
-          onPress={()=>{navigation.navigate('CadastroReceita');}}>
+          <Button
+            style={styles.buttonReceita}
+            onPress={() => {
+              navigation.navigate('CadastroReceita');
+            }}>
             <Text style={styles.buttonTexto}>Adicionar Receita</Text>
           </Button>
         </View>
-        <View style={styles.overlay2}>
-      </View>
-      <View style={styles.content2}>
-        <Text style={styles.texto}>Despesas</Text>
-        <Text style={styles.texto}>R$ 0,00</Text>
-        <Button style={styles.buttonDespesa}
-            onPress={()=>{navigation.navigate('CadastroDespesa');}}>
-          <Text style={styles.buttonTexto}>Adicionar Despesa</Text>
-        </Button>
-      </View>
-      <View>
-        <Button style={styles.buttonProfile}
-            onPress={()=>{navigation.navigate('CadastroDespesa');}}>
-          <Text style={styles.buttonTexto}>Meu perfil</Text>
-        </Button>
-      </View>
+        <View style={styles.overlay2}></View>
+        <View style={styles.content2}>
+          <Text style={styles.texto}>Despesas</Text>
+          <Text style={styles.texto}>R$ 0,00</Text>
+          <Button
+            style={styles.buttonDespesa}
+            onPress={() => {
+              navigation.navigate('CadastroDespesa');
+            }}>
+            <Text style={styles.buttonTexto}>Adicionar Despesa</Text>
+          </Button>
+        </View>
+        <View>
+          <Button
+            style={styles.buttonProfile}
+            onPress={() => {
+              navigation.navigate('CadastroDespesa');
+            }}>
+            <Text style={styles.buttonTexto}>Meu perfil</Text>
+          </Button>
+        </View>
+        <View>
+          <Button
+            style={styles.buttonProfile}
+            onPress={() => {
+              navigation.navigate('Charts');
+            }}>
+            <Text style={styles.buttonTexto}>Meus relatórios</Text>
+          </Button>
+        </View>
       </View>
     </NativeBaseProvider>
   );
@@ -91,9 +105,11 @@ const styles = StyleSheet.create({
   },
   content2: {
     margin: 32,
+    flex: 2,
   },
   overlay2: {
     position: 'absolute',
+    flex: 1,
     top: 0,
     left: 0,
     right: 0,
@@ -113,6 +129,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 50,
     borderRadius: 16,
+    height: 52,
   },
   buttonDespesa: {
     backgroundColor: '#79d6f7',
@@ -121,6 +138,7 @@ const styles = StyleSheet.create({
     marginRight: 10,
     marginBottom: 50,
     borderRadius: 16,
+    height: 52,
   },
   buttonTexto: {
     color: '#1348cf',
@@ -136,8 +154,8 @@ const styles = StyleSheet.create({
   buttonProfile: {
     backgroundColor: '#79d6f7',
     marginTop: 10,
-    marginLeft: 25,
-    marginRight: 25,
+    marginLeft: 40,
+    marginRight: 40,
     marginBottom: 50,
     borderRadius: 16,
   },

@@ -3,10 +3,10 @@
  /* eslint-disable prettier/prettier */
 
 import React from 'react';
-import "./src/config/firebaseConfig"
+import './src/config/firebaseConfig';
 import { NativeBaseProvider} from 'native-base';
 import  { Routes }  from './src/routes/index';
-import { NavigationContainer } from '@react-navigation/native';;
+import { NavigationContainer } from '@react-navigation/native';
 
 function App() {
 
