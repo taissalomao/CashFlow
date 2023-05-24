@@ -7,33 +7,14 @@ import {View, Text, StyleSheet, Alert, BackHandler} from 'react-native';
 import {Button, NativeBaseProvider} from 'native-base';
 import {useNavigation} from '@react-navigation/native';
 import { useAuthentication } from '../utils/authenticator';
+import { useConfirmationExitEffect } from '../components/confirmExit';
 import { getAuth, signOut } from 'firebase/auth';
 
 
 function HomeScreen(/* { username } */) {
+  useConfirmationExitEffect();
   const navigation = useNavigation();
-  const auth = getAuth();
-  React.useEffect(() => {
-    const backAction = () => {
-      Alert.alert(
-        'Confirmação',
-        'Deseja encerrar sua sessão??',
-        [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Sair', onPress: async () =>  {await signOut(auth); navigation.navigate("Login")} }
-        ]
-      );
-      return true;
-    };
-  
-    const backHandler = BackHandler.addEventListener(
-      'hardwareBackPress',
-      backAction
-    );
-  
-    return () => backHandler.remove();
-  }, []);
-  
+
 
   return (
     <NativeBaseProvider>

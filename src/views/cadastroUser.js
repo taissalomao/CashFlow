@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider } from 'native-base';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
+import { set } from 'firebase/database';
 
 function CadastroScreen() {
   const navigation = useNavigation();
@@ -15,8 +16,10 @@ function CadastroScreen() {
     try {
       await createUserWithEmailAndPassword(auth, user.email, user.senha).then(
         async (result) => {
+          const { uid } = result.user; // Obtém o UID do usuário retornado
           const usersRef = collection(db, 'users');
-          await addDoc(usersRef, user);
+          const newUserDocRef = doc(usersRef, uid); // Cria uma referência ao documento com o UID do usuário
+          await set(newUserDocRef, user); // Define (sobrescreve) o documento no Firestore com o UID do usuário
           navigation.navigate('Home');
         }
       );
@@ -24,6 +27,7 @@ function CadastroScreen() {
       console.log(error);
     }
   }
+  
 
   return (
     <NativeBaseProvider>
