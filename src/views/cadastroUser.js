@@ -6,7 +6,6 @@ import {View, StyleSheet} from 'react-native';
 import {Button, Input, Text, NativeBaseProvider } from 'native-base';
 import {set, ref} from 'firebase/database';
 import {createUserWithEmailAndPassword, getAuth} from 'firebase/auth';
-/* import {addDoc, collection} from 'firebase/firestore'; */
 import {database} from '../config/firebaseConfig';
 
 function CadastroScreen() {
@@ -18,6 +17,7 @@ function CadastroScreen() {
         async result => {
           set(ref(database, `user/${result.user.uid}`), user);
         },
+        
       );
     } catch (error) {
       console.log(error);

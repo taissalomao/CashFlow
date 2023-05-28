@@ -56,7 +56,7 @@ function LoginScreen() {
           </View>
           <View style={{ width: '100%', paddingHorizontal: 20, marginTop: 20 }}>
             <Button size="lg" borderRadius={16} onPress={()=>{navigation.navigate('Home');}} colorScheme="blue" style={{ marginBottom: 10 }}>Login</Button>
-            <Button size="lg" style={{ marginBottom: 10, borderRadius: 16 }}>Login com Google</Button>
+{/*             <Button size="lg" style={{ marginBottom: 10, borderRadius: 16 }}>Login com Google</Button> */}
           </View>
         </View>
       </View>
