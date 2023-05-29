@@ -3,12 +3,18 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable prettier/prettier */
 import React from 'react';
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, Alert, BackHandler} from 'react-native';
 import {Button, NativeBaseProvider} from 'native-base';
 import {useNavigation} from '@react-navigation/native';
+import { useAuthentication } from '../utils/authenticator';
+import { useConfirmationExitEffect } from '../components/confirmExit';
+import { getAuth, signOut } from 'firebase/auth';
+
 
 function HomeScreen(/* { username } */) {
+  useConfirmationExitEffect();
   const navigation = useNavigation();
+
 
   return (
     <NativeBaseProvider>

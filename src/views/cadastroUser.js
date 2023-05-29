@@ -1,74 +1,73 @@
-/* eslint-disable prettier/prettier */
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable prettier/prettier */
-import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Button, Input, Text, NativeBaseProvider } from 'native-base';
-import {set, ref} from 'firebase/database';
-import {createUserWithEmailAndPassword, getAuth} from 'firebase/auth';
-import {database} from '../config/firebaseConfig';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Button, Input, Text, NativeBaseProvider } from 'native-base';
+import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { addDoc, collection, doc } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
+import { useNavigation } from '@react-navigation/native';
+import { set } from 'firebase/database';
 
 function CadastroScreen() {
-  const [user, setUser] = useState({nome: '', email: '', senha: ''});
+  const navigation = useNavigation();
+  const [user, setUser] = useState({ nome: '', email: '', senha: '' });
   const auth = getAuth();
+
   async function handleRegister() {
     try {
       await createUserWithEmailAndPassword(auth, user.email, user.senha).then(
-        async result => {
-          set(ref(database, `user/${result.user.uid}`), user);
-        },
-        
+        async (result) => {
+          const { uid } = result.user; // Obtém o UID do usuário retornado
+          const usersRef = collection(db, 'users');
+          const newUserDocRef = doc(usersRef, uid); // Cria uma referência ao documento com o UID do usuário
+          await set(newUserDocRef, user); // Define (sobrescreve) o documento no Firestore com o UID do usuário
+          navigation.navigate('Home');
+        }
       );
     } catch (error) {
       console.log(error);
     }
   }
+  
+
   return (
     <NativeBaseProvider>
-{/*       <AppBar /> */}
       <View style={styles.containerPai}>
         <View style={styles.containerFilho}>
-          <View style={styles.content} >
+          <View style={styles.content}>
             <View style={styles.formulario}>
-            <Text style={styles.teste}>Cadastro de Usuário</Text>
-              <View
-                style={styles.inputs}>
+              <Text style={styles.teste}>Cadastro de Usuário</Text>
+              <View style={styles.inputs}>
                 <Input
                   variant="outline"
                   placeholder="Nome"
-                  onChangeText={e => setUser({...user, nome: e})}
+                  onChangeText={(e) => setUser({ ...user, nome: e })}
                 />
               </View>
-              <View
-                style={styles.inputs}>
+              <View style={styles.inputs}>
                 <Input
                   variant="outline"
                   placeholder="Email"
-                  onChangeText={e => setUser({...user, email: e})}
+                  onChangeText={(e) => setUser({ ...user, email: e })}
                 />
               </View>
-              <View
-                style={styles.inputs}>
+              <View style={styles.inputs}>
                 <Input
                   variant="outline"
                   placeholder="Senha"
-                  onChangeText={e => setUser({...user, senha: e})}
+                  onChangeText={(e) => setUser({ ...user, senha: e })}
                 />
               </View>
-              <View
-                style={styles.inputs}>
+              <View style={styles.inputs}>
                 <Input variant="outline" placeholder="Confirme a senha" />
               </View>
               <View style={styles.inputs}>
-                <Button style={styles.saveButton}
-                  onPress={() => handleRegister()}>
+                <Button style={styles.saveButton} onPress={handleRegister}>
                   <Text style={styles.textSaveButton}>Salvar</Text>
                 </Button>
               </View>
             </View>
+          </View>
         </View>
-        </View>
-
       </View>
     </NativeBaseProvider>
   );

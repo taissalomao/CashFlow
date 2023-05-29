@@ -1,16 +1,31 @@
 /* eslint-disable prettier/prettier */
 /* eslint-disable react-native/no-inline-styles */
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, { useState } from 'react';
 import {View, StyleSheet} from 'react-native';
 import {Input, Select, Text, Button} from 'native-base';
 import { NativeBaseProvider} from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-
+import { useAuthentication } from '../utils/authenticator';
+import { addDoc, collection, doc } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
 
 function CadastroDespesaScreen (){
-
+  const [despesa, setDespesa] = useState({nome:"", valor:""});
   const navigation = useNavigation();
+  const {user} = useAuthentication();
+  
+  async function cadastroDespesa() {
+    try {
+      const userDocRef = doc(db, 'users', user.uid); // Referência ao documento do usuário
+      const despesasRef = collection(userDocRef, 'despesas'); // Subcoleção 'despesas' dentro do documento do usuário
+      await addDoc(despesasRef, despesa); // Adiciona a despesa à subcoleção 'despesas'
+      setDespesa({ nome: '', valor: '' });
+      navigation.navigate('Home');
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   return (
     <NativeBaseProvider>
@@ -20,15 +35,15 @@ function CadastroDespesaScreen (){
             <Text style={styles.texto}>Cadastro de Despesa</Text>
             <View
               style={styles.inputs}>
-              <Input variant="outline" placeholder="Nome" />
+              <Input variant="outline" placeholder="Nome"  onChangeText={(e) => setDespesa({ ...despesa, nome: e })} />
             </View>
             <View
               style={styles.inputs}>
-              <Input variant="outline" placeholder="Descrição"/>
+              <Input variant="outline" placeholder="Descrição" />
             </View>
             <View
               style={styles.inputs}>
-              <Input variant="outline" placeholder="Valor R$"/>
+              <Input variant="outline" placeholder="Valor R$" onChangeText={(e) => setDespesa({ ...despesa, valor: e })} />
             </View>
             <View
               style={styles.inputs}>
@@ -45,7 +60,7 @@ function CadastroDespesaScreen (){
             </View>
             <View style={{width: '100%', paddingHorizontal: 20, marginTop: 20}}>
               <Button size="md" colorScheme="blue" styles={styles.saveButton} >
-              <Text styles={styles.textSaveButton}>Salvar</Text>
+              <Text styles={styles.textSaveButton} onPress={cadastroDespesa}>Salvar</Text>
               </Button>
             </View>
             <View style={{width: '100%', paddingHorizontal: 20}}>
