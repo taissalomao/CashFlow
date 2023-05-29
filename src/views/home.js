@@ -51,7 +51,7 @@ function HomeScreen(/* { username } */) {
           <Button
             style={styles.buttonProfile}
             onPress={() => {
-              navigation.navigate('CadastroDespesa');
+              navigation.navigate('Perfil');
             }}>
             <Text style={styles.buttonTexto}>Meu perfil</Text>
           </Button>

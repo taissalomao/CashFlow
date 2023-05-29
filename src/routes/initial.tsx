@@ -12,7 +12,6 @@ import InitialScreen from "../views/paginaInicial";
 
 const InitialRoutes: React.FC = () =>{
     return (
-        
         <Navigator>
             <Screen name="Inicial" component={InitialScreen} options={{ headerShown: false }}/>
             <Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />

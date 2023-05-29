@@ -12,8 +12,9 @@ import ListagemDespesaScreen from "../views/listaDespesas";
 import CadastroReceitaScreen from "../views/cadastroReceita";
 import ListagemReceitaScreen from "../views/listaReceitas";
 import ChartScreen from "../views/charts";
-import LoginScreen from "../views/login";
-import CadastroScreen from "../views/cadastroUser";
+//import LoginScreen from "../views/login";
+//import CadastroScreen from "../views/cadastroUser";
+import PerfilScreen from "../views/meuPerfil";
 
 
 const AuthRoutes: React.FC = () =>{
@@ -26,6 +27,7 @@ const AuthRoutes: React.FC = () =>{
             <Screen name="Despesas" component={ListagemDespesaScreen} options={{ headerShown: false }}/>
             <Screen name="Receitas" component={ListagemReceitaScreen} options={{ headerShown: false }}/>
             <Screen name="Charts" component={ChartScreen} options={{ headerShown:false }} />
+            <Screen name="Perfil" component={PerfilScreen} options={{ headerShown:false }} />
         </Navigator>
     );
 };

@@ -6,9 +6,9 @@ import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { collection, doc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
- import { set } from 'firebase/database';
+import { set } from 'firebase/database';
 
-function CadastroScreen() {
+function PerfilScreen() {
   const navigation = useNavigation();
   const [user, setUser] = useState({ nome: '', email: '', senha: '' });
   const auth = getAuth();
@@ -17,10 +17,10 @@ function CadastroScreen() {
     try {
       await createUserWithEmailAndPassword(auth, user.email, user.senha).then(
         async (result) => {
-          const { uid } = result.user; // Obtém o UID do usuário retornado
+          const { uid } = result.user;
           const usersRef = collection(db, 'users');
-          const newUserDocRef = doc(usersRef, uid); // Cria uma referência ao documento com o UID do usuário
-          await set(newUserDocRef, user); // Define (sobrescreve) o documento no Firestore com o UID do usuário
+          const newUserDocRef = doc(usersRef, uid);
+          await set(newUserDocRef, user);
           navigation.navigate('Home');
         }
       );
@@ -35,7 +35,7 @@ function CadastroScreen() {
         <View style={styles.containerFilho}>
           <View style={styles.content}>
             <View style={styles.formulario}>
-              <Text style={styles.teste}>Meu Perfil</Text>
+              <Text style={styles.teste}>Cadastro de Usuário</Text>
               <View style={styles.inputs}>
                 <Input
                   variant="outline"
@@ -73,7 +73,7 @@ function CadastroScreen() {
   );
 }
 
-export default CadastroScreen;
+export default PerfilScreen;
 
 const styles = StyleSheet.create({
   containerPai: {
