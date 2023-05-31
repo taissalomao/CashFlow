@@ -35,7 +35,7 @@ function PerfilScreen() {
         <View style={styles.containerFilho}>
           <View style={styles.content}>
             <View style={styles.formulario}>
-              <Text style={styles.teste}>Cadastro de Usuário</Text>
+              <Text style={styles.teste}>Meu perfil</Text>
               <View style={styles.inputs}>
                 <Input
                   variant="outline"

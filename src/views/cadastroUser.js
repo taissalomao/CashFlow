@@ -1,26 +1,44 @@
 /* eslint-disable prettier/prettier */
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Input, Text, NativeBaseProvider } from 'native-base';
+import { Button, Input, Text, NativeBaseProvider, FormControl, Box } from 'native-base';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { collection, doc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
- import { set } from 'firebase/database';
+import { set } from 'firebase/database';
 
 function CadastroScreen() {
   const navigation = useNavigation();
   const [user, setUser] = useState({ nome: '', email: '', senha: '' });
+  const [confirmSenha, setConfirmSenha] = useState('');
+  const [senhaError, setSenhaError] = useState('');
+  const [confirmSenhaError, setConfirmSenhaError] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const auth = getAuth();
 
   async function handleRegister() {
     try {
+      setSenhaError('');
+      setConfirmSenhaError('');
+
+      if (user.senha !== confirmSenha) {
+        setConfirmSenhaError('As senhas não correspondem');
+        return;
+      }
+
+      if (user.senha.length < 6) {
+        setSenhaError('A senha deve ter no mínimo 6 caracteres');
+        return;
+      }
+
       await createUserWithEmailAndPassword(auth, user.email, user.senha).then(
         async (result) => {
-          const { uid } = result.user; // Obtém o UID do usuário retornado
+          const { uid } = result.user;
           const usersRef = collection(db, 'users');
-          const newUserDocRef = doc(usersRef, uid); // Cria uma referência ao documento com o UID do usuário
-          await set(newUserDocRef, user); // Define (sobrescreve) o documento no Firestore com o UID do usuário
+          const newUserDocRef = doc(usersRef, uid);
+          await set(newUserDocRef, user);
           navigation.navigate('Home');
         }
       );
@@ -35,36 +53,93 @@ function CadastroScreen() {
         <View style={styles.containerFilho}>
           <View style={styles.content}>
             <View style={styles.formulario}>
-              <Text style={styles.teste}>Meu Perfil</Text>
-              <View style={styles.inputs}>
+              <Text style={styles.teste}>Cadastre-se</Text>
+              <FormControl>
+                <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+                  Nome
+                </FormControl.Label>
                 <Input
                   variant="outline"
                   placeholder="Nome"
                   onChangeText={(e) => setUser({ ...user, nome: e })}
                 />
-              </View>
-              <View style={styles.inputs}>
+              </FormControl>
+              <FormControl>
+                <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+                  E-mail
+                </FormControl.Label>
                 <Input
                   variant="outline"
-                  placeholder="Email"
+                  placeholder="E-mail"
                   onChangeText={(e) => setUser({ ...user, email: e })}
                 />
-              </View>
-              <View style={styles.inputs}>
+              </FormControl>
+              <FormControl
+                isRequired={true}
+                isInvalid={senhaError !== ''}
+                mb={3}
+              >
+                <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+                  Senha
+                </FormControl.Label>
                 <Input
                   variant="outline"
                   placeholder="Senha"
-                  onChangeText={(e) => setUser({ ...user, senha: e })}
+                  type={showPassword ? 'text' : 'password'}
+                  value={user.senha}
+                  onChangeText={(e) => {
+                    setSenhaError('');
+                    setUser({ ...user, senha: e });
+                  }}
+                  InputRightElement={
+                    <Button
+                      variant="ghost"
+                      onPress={() => setShowPassword(!showPassword)}
+                    >
+                      {showPassword ? 'Ocultar' : 'Mostrar'}
+                    </Button>
+                  }
                 />
-              </View>
-              <View style={styles.inputs}>
-                <Input variant="outline" placeholder="Confirme a senha" />
-              </View>
-              <View style={styles.inputs}>
-                <Button style={styles.saveButton} onPress={handleRegister}>
-                  <Text style={styles.textSaveButton}>Salvar</Text>
-                </Button>
-              </View>
+                {senhaError !== '' && (
+                  <Text color="red.500" fontSize="sm" mt={1}>
+                    {senhaError}
+                  </Text>
+                )}
+              </FormControl>
+              <FormControl
+                isInvalid={confirmSenhaError !== ''}
+                mb={3}
+              >
+                <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+                  Confirme a senha
+                </FormControl.Label>
+                <Input
+                  variant="outline"
+                  placeholder="Confirme a senha"
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  value={confirmSenha}
+                  onChangeText={(e) => {
+                    setConfirmSenhaError('');
+                    setConfirmSenha(e);
+                  }}
+                  InputRightElement={
+                    <Button
+                      variant="ghost"
+                      onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+                    >
+                      {showConfirmPassword ? 'Ocultar' : 'Mostrar'}
+                    </Button>
+                  }
+                />
+                {confirmSenhaError !== '' && (
+                  <Text color="red.500" fontSize="sm" mt={1}>
+                    {confirmSenhaError}
+                  </Text>
+                )}
+              </FormControl>
+              <Button style={styles.saveButton} onPress={handleRegister}>
+                <Text style={styles.textSaveButton}>Salvar</Text>
+              </Button>
             </View>
           </View>
         </View>
@@ -104,11 +179,6 @@ const styles = StyleSheet.create({
   formulario: {
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  inputs: {
-    width: '100%',
-    paddingHorizontal: 20,
-    marginBottom: 10,
   },
   saveButton: {
     backgroundColor: '#79d6f7',
