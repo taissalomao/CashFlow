@@ -1,41 +1,84 @@
 /* eslint-disable prettier/prettier */
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
+import { useAuthentication } from '../utils/authenticator';
+import { doc } from 'firebase/firestore';
+import Dialog from 'react-native-popup-dialog';
 
-const expenses = [
-  { id: '1', title: 'Compras do mês', amount: 200.00 },
-  { id: '2', title: 'Conta de luz', amount: 80.00 },
-  { id: '3', title: 'Combustível', amount: 60.00 },
-  { id: '4', title: 'Manutenção do carro', amount: 150.00 },
-  { id: '5', title: 'Assinatura da academia', amount: 80.00 },
-  { id: '6', title: 'Aluguel', amount: 1000.00 },
-  { id: '7', title: 'Manutenção do carro', amount: 150.00 },
-  { id: '8', title: 'Assinatura da academia', amount: 80.00 },
-  { id: '9', title: 'Aluguel', amount: 1000.00 },
-  { id: '10', title: 'Globoplay', amount: 50.00 },
-  { id: '11', title: 'Netflix', amount: 30.00 },
-  { id: '12', title: 'Fone', amount: 20.00 },
-  { id: '13', title: 'Peça de carro', amount: 80.00 },
-  { id: '14', title: 'Ifood', amount: 20.00 },
-];
 
 const ListagemDespesaScreen = () => {
-
+  const [expenses, setExpenses] = useState([]);
+  const [totalDespesas, setTotalDespesas] = useState(0);
+  const [selectedExpense, setSelectedExpense] = useState(null);
+  const [showModal, setShowModal] = useState(false);
+  const [loading, setLoading] = useState(false);
   const navigation = useNavigation();
+  const { user } = useAuthentication();
+
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      console.log('User:', user);
+      console.log('User ID:', user?.uid);
+
+      try {
+        const userDocRef = doc(db, 'user', user?.uid);
+        const expensesRef = collection(userDocRef, 'despesas');
+        const q = query(expensesRef);
+        const querySnapshot = await getDocs(q);
+        const expenseList = [];
+        let total = 0;
+        querySnapshot.forEach((doc) => {
+          const expense = { id: doc.id, ...doc.data() };
+          expenseList.push(expense);
+          total += expense.valor;
+        });
+        console.log('Expense List:', expenseList);
+        setExpenses(expenseList);
+        setTotalDespesas(total);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchExpenses();
+  }, [user, user?.uid]);
 
   const renderExpenseItem = ({ item }) => (
-    <View style={styles.expenseItem}>
-      <Text style={styles.expenseTitle}>{item.title}</Text>
-      <Text style={styles.expenseAmount}>R$ {item.amount.toFixed(2)}</Text>
-    </View>
+    <TouchableOpacity style={styles.expenseItem} onPress={() => handleExpensePress(item)}>
+      <Text style={styles.expenseTitle}>{item.nome}</Text>
+      <Text style={styles.expenseAmount}>R$ {item.valor.toFixed(2)}</Text>
+    </TouchableOpacity>
   );
+
+  const handleExpensePress = (expense) => {
+    setSelectedExpense(expense);
+    setShowModal(true);
+  };
+
+  const handleExpenseDelete = async () => {
+    setShowModal(false);
+    setLoading(true);
+    try {
+      await deleteDoc(doc(db, 'user', user?.uid, 'despesas', selectedExpense.id));
+      const updatedExpenses = expenses.filter((e) => e.id !== selectedExpense.id);
+      setExpenses(updatedExpenses);
+      const total = updatedExpenses.reduce((acc, cur) => acc + cur.valor, 0);
+      setTotalDespesas(total);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
-      <View style={{backgroundColor: 'blue', height: 80}}>
+      <View style={[styles.container, { backgroundColor: 'blue', height: 30 }]}>
         <Text>Lista de despesas</Text>
-        <Text>Total despesas: R$ 2000,00</Text>
+        <Text>Total despesas: R$ {totalDespesas.toFixed(2)}</Text>
       </View>
       <View style={styles.container}>
         <View style={styles.expenseListContainer}>
@@ -43,16 +86,43 @@ const ListagemDespesaScreen = () => {
             data={expenses}
             renderItem={renderExpenseItem}
             keyExtractor={(item) => item.id}
+            ListEmptyComponent={<Text>Nenhuma despesa encontrada</Text>}
           />
           <View style={styles.topSection}>
-            <TouchableOpacity style={styles.addButton} onPress={()=>{navigation.navigate('CadastroDespesa');}}>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={() => {
+                navigation.navigate('CadastroDespesa');
+              }}
+            >
               <Text style={styles.addButtonText}>Adicionar despesa</Text>
             </TouchableOpacity>
           </View>
         </View>
       </View>
-    </>
 
+      <Dialog
+        visible={showModal}
+        onTouchOutside={() => setShowModal(false)}
+        dialogStyle={styles.dialogContainer}
+      >
+        {selectedExpense && (
+          <>
+            <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
+            <Text style={styles.expenseValue}>R$ {selectedExpense.valor.toFixed(2)}</Text>
+            <Text style={styles.expenseDescription}>{selectedExpense.descricao}</Text>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={handleExpenseDelete}
+              disabled={loading}
+            >
+              <Text style={styles.deleteButtonText}>Excluir</Text>
+            </TouchableOpacity>
+            {loading && <Text>Excluindo despesa...</Text>}
+          </>
+        )}
+      </Dialog>
+    </>
   );
 };
 
@@ -100,6 +170,36 @@ const styles = StyleSheet.create({
   expenseAmount: {
     fontSize: 14,
     color: 'black',
+  },
+  dialogContainer: {
+    padding: 16,
+    backgroundColor: 'white',
+    borderRadius: 8,
+  },
+  expenseName: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+  },
+  expenseValue: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginBottom: 16,
+  },
+  expenseDescription: {
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignSelf: 'flex-end',
+  },
+  deleteButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
   },
 });
 
