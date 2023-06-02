@@ -7,7 +7,7 @@ import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 import { doc } from 'firebase/firestore';
 import Dialog from 'react-native-popup-dialog';
-
+import { NativeBaseProvider, Button } from 'native-base';
 
 const ListagemDespesaScreen = () => {
   const [expenses, setExpenses] = useState([]);
@@ -75,7 +75,7 @@ const ListagemDespesaScreen = () => {
   };
 
   return (
-    <>
+    <NativeBaseProvider>
       <View style={[styles.container, { backgroundColor: 'blue', height: 30 }]}>
         <Text>Lista de despesas</Text>
         <Text>Total despesas: R$ {totalDespesas.toFixed(2)}</Text>
@@ -89,14 +89,15 @@ const ListagemDespesaScreen = () => {
             ListEmptyComponent={<Text>Nenhuma despesa encontrada</Text>}
           />
           <View style={styles.topSection}>
-            <TouchableOpacity
+            <Button
               style={styles.addButton}
               onPress={() => {
                 navigation.navigate('CadastroDespesa');
               }}
+              colorScheme="teal"
             >
-              <Text style={styles.addButtonText}>Adicionar despesa</Text>
-            </TouchableOpacity>
+              Adicionar despesa
+            </Button>
           </View>
         </View>
       </View>
@@ -111,18 +112,19 @@ const ListagemDespesaScreen = () => {
             <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
             <Text style={styles.expenseValue}>R$ {selectedExpense.valor.toFixed(2)}</Text>
             <Text style={styles.expenseDescription}>{selectedExpense.descricao}</Text>
-            <TouchableOpacity
+            <Button
               style={styles.deleteButton}
               onPress={handleExpenseDelete}
               disabled={loading}
+              colorScheme="red"
             >
-              <Text style={styles.deleteButtonText}>Excluir</Text>
-            </TouchableOpacity>
+              Excluir
+            </Button>
             {loading && <Text>Excluindo despesa...</Text>}
           </>
         )}
       </Dialog>
-    </>
+    </NativeBaseProvider>
   );
 };
 
@@ -140,15 +142,10 @@ const styles = StyleSheet.create({
     marginTop: 16,
   },
   addButton: {
-    backgroundColor: '#79d6f7',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
     marginRight: 60,
-  },
-  addButtonText: {
-    color: '#1348cf',
-    fontWeight: 'bold',
   },
   expenseListContainer: {
     flex: 1,
@@ -191,15 +188,10 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   deleteButton: {
-    backgroundColor: 'red',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
     alignSelf: 'flex-end',
-  },
-  deleteButtonText: {
-    color: 'white',
-    fontWeight: 'bold',
   },
 });
 

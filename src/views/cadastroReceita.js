@@ -1,123 +1,130 @@
 /* eslint-disable prettier/prettier */
-/* eslint-disable react-native/no-inline-styles */
-/* eslint-disable prettier/prettier */
-import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {Button, Input, Select, Text} from 'native-base';
-import {NativeBaseProvider} from 'native-base';
-import {useNavigation } from '@react-navigation/native';
-import {set, ref} from 'firebase/database';
-import {getAuth} from 'firebase/auth';
-import {database} from '../config/firebaseConfig';
+import React, { useState } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Button, Input, Text, NativeBaseProvider, FormControl } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
+import { collection, addDoc } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
+import { useAuthentication } from '../utils/authenticator';
 
-function CadastroReceitaScreen() {
+const CadastroDespesaScreen = () => {
   const navigation = useNavigation();
+  const { user } = useAuthentication();
+  const [nomeDespesa, setNomeDespesa] = useState('');
+  const [valorDespesa, setValorDespesa] = useState('');
+  const [descricaoDespesa, setDescricaoDespesa] = useState('');
+  const [categoriaDespesa, setCategoriaDespesa] = useState('');
+  const [dataDespesa, setDataDespesa] = useState('');
 
-
-  const [receita, setReceita] = useState({nome: '', descricao: '', valor: '', categoria: ''});
-  const auth = getAuth();
-  async function handleRegister() {
+  const handleAddrevenue = async () => {
     try {
-      await (auth, receita.nome, receita.descricao, receita.valor, receita.categoria).then(
-        async result => {
-          set(ref(database, `receita/${result.receita.uid}`), receita);
-        },
-      );
+      const revenuesRef = collection(db, 'user', user?.uid, 'receitas');
+      await addDoc(revenuesRef, {
+        nome: nomeDespesa,
+        valor: parseFloat(valorDespesa),
+      });
+
+      navigation.navigate('Receitas');
     } catch (error) {
       console.log(error);
     }
-  }
+  };
 
   return (
     <NativeBaseProvider>
-      <View style={styles.containerPai}>
-        <View style={styles.containerFilho}>
-          <View style={styles.content} >
-            <Text style={styles.texto}>Cadastro de Receita</Text>
-            <View
-              style={styles.inputs}>
-              <Input variant="outline" placeholder="Nome" onChangeText={e => setReceita({...receita, nome: e})} />
-            </View>
-            <View
-              style={styles.inputs}>
-              <Input variant="outline" placeholder="Descrição" onChangeText={e => setReceita({...receita, descricao: e})} />
-            </View>
-            <View
-              style={styles.inputs}>
-              <Input variant="outline" placeholder="Valor R$" onChangeText={e => setReceita({...receita, valor: e})} />
-            </View>
-            <View
-              style={styles.inputs}>
-              <Select
-                minWidth="200"
-                accessibilityLabel="Choose Service"
-                placeholder="Categoria" onChangeText={e => setReceita({...receita, categoria: e})}>
-                <Select.Item label="Salário" value="Salário" />
-                <Select.Item label="Investimento" value="Investimento" />
-                <Select.Item label="Apto Alugado" value="Apto Alugado" />
-                <Select.Item label="Pensão" value="Pensão" />
-              </Select>
-            </View>
-            <View style={{width: '100%', paddingHorizontal: 20, marginTop: 20}}>
-              <Button size="md" colorScheme="blue" style={styles.saveButton} onPress={() => handleRegister()}>
-              <Text styles={styles.textSaveButton}>Salvar</Text>
-              </Button>
-            </View>
-            <View style={{width: '100%', paddingHorizontal: 20}}>
-              <Button
-                size="md"
-                colorScheme="blue"
-                style={styles.saveButton}
-                onPress={() => {
-                  navigation.navigate('Receitas');
-                }}>
-                <Text styles={styles.textSaveButton}>Minhas Receitas</Text>
-              </Button>
-            </View>
-          </View>
-        </View>
+      <View style={styles.container}>
+        <Text style={styles.teste}>Cadastre a Receita</Text>
+
+        <FormControl>
+          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+            Nome:
+          </FormControl.Label>
+          <Input
+            variant="outline"
+            value={nomeDespesa}
+            onChangeText={setNomeDespesa}
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+            Descrição:
+          </FormControl.Label>
+          <Input
+            variant="outline"
+            value={descricaoDespesa}
+            onChangeText={setDescricaoDespesa}
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+            Valor:
+          </FormControl.Label>
+          <Input
+            variant="outline"
+            value={valorDespesa}
+            onChangeText={setValorDespesa}
+            keyboardType="numeric"
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+            Categoria:
+          </FormControl.Label>
+          <Input
+            variant="outline"
+            value={categoriaDespesa}
+            onChangeText={setCategoriaDespesa}
+          />
+        </FormControl>
+
+        <FormControl>
+          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+            Data:
+          </FormControl.Label>
+          <Input
+            type="date"
+            variant="outline"
+            value={dataDespesa}
+            onChangeText={setDataDespesa}
+          />
+        </FormControl>
+
+        <Button style={styles.addButton} onPress={handleAddrevenue}>
+          <Text style={styles.addButtonText}>Adicionar Receita</Text>
+        </Button>
       </View>
     </NativeBaseProvider>
   );
-}
-
-export default CadastroReceitaScreen;
+};
 
 const styles = StyleSheet.create({
-  containerPai: {
+  container: {
     flex: 1,
-    backgroundColor: '#EAF0F7',
-    justifyContent: 'flex-start',
-  },
-  containerFilho: {
-    flex: 0.3,
-    backgroundColor: 'blue',
-    paddingTop: 70,
-  },
-  inputs: {
-    width: '100%',
-    paddingHorizontal: 10,
-    marginBottom: 10,
-  },
-  content: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginVertical: 20,
-    borderRadius: 16,
-    padding: 10,
-    height: 500,
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     alignItems: 'center',
+    paddingHorizontal: 16,
+    backgroundColor: '#EAF0F7',
   },
-  saveButton: {
+  teste: {
+    fontSize: 20,
+    marginBottom: 20,
+    fontWeight: 'bold',
+  },
+  addButton: {
     backgroundColor: '#79d6f7',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
-    marginTop: 10,
+    marginTop: 20,
   },
-  textSaveButton: {
-    color: 'blue',
+  addButtonText: {
+    color: '#1348cf',
     fontWeight: 'bold',
+    fontSize: 16,
   },
 });
+
+export default CadastroDespesaScreen;

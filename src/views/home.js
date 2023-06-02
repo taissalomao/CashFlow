@@ -23,28 +23,44 @@ function HomeScreen(/* { username } */) {
         <View style={styles.container}>
           <Text style={styles.username}>Bem vindo{/* {username} */}</Text>
         </View>
-        <View style={styles.overlay}></View>
-        <View style={styles.content}>
+        <View style={styles.overlay}>
           <Text style={styles.texto}>Saldo</Text>
           <Text style={styles.texto}>R$ 0,00</Text>
           <Button
-            style={styles.buttonReceita}
+            style={styles.buttonMinhasReceitas}
             onPress={() => {
               navigation.navigate('CadastroReceita');
             }}>
             <Text style={styles.buttonTexto}>Adicionar Receita</Text>
           </Button>
         </View>
-        <View style={styles.overlay2}></View>
-        <View style={styles.content2}>
-          <Text style={styles.texto}>Despesas</Text>
-          <Text style={styles.texto}>R$ 0,00</Text>
+        <View style={styles.content}>
           <Button
+            style={styles.buttonReceita}
+            onPress={() => {
+              navigation.navigate('Receitas');
+            }}>
+            <Text style={styles.buttonTexto}>Minhas Receitas</Text>
+          </Button>
+        </View>
+        <View style={styles.overlay2}>
+        <Text style={styles.texto}>Despesas</Text>
+          <Text style={styles.texto}>R$ 0,00</Text>
+        <Button
             style={styles.buttonDespesa}
             onPress={() => {
               navigation.navigate('CadastroDespesa');
             }}>
             <Text style={styles.buttonTexto}>Adicionar Despesa</Text>
+          </Button>
+        </View>
+        <View style={styles.content2}>
+        <Button
+            style={styles.buttonReceita}
+            onPress={() => {
+              navigation.navigate('Despesas');
+            }}>
+            <Text style={styles.buttonTexto}>Minhas Despesas</Text>
           </Button>
         </View>
         <View>
@@ -106,7 +122,7 @@ const styles = StyleSheet.create({
     border: '1px solid #f8f8f8',
   },
   content: {
-    flex: 1,
+    flex: 2,
     margin: 32,
   },
   content2: {
@@ -137,6 +153,16 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     height: 52,
   },
+  buttonMinhasReceitas: {
+    backgroundColor: '#79d6f7',
+    marginTop: 100,
+    marginLeft: 10,
+    marginRight: 10,
+    borderRadius: 16,
+    padding: 100,
+    height: 52,
+  },
+
   buttonDespesa: {
     backgroundColor: '#79d6f7',
     marginTop: 50,
