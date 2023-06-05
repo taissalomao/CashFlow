@@ -2,19 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { collection, query, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 import { doc } from 'firebase/firestore';
-import Dialog from 'react-native-popup-dialog';
 import { NativeBaseProvider, Button } from 'native-base';
 
 const ListagemDespesaScreen = () => {
   const [expenses, setExpenses] = useState([]);
   const [totalDespesas, setTotalDespesas] = useState(0);
-  const [selectedExpense, setSelectedExpense] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [selectedExpense, setSelectedExpense] = useState(null); // Variável para armazenar a despesa selecionada
   const navigation = useNavigation();
   const { user } = useAuthentication();
 
@@ -46,46 +43,50 @@ const ListagemDespesaScreen = () => {
     fetchExpenses();
   }, [user, user?.uid]);
 
+  const handleEditExpense = (expenseId) => {
+    const expenseToEdit = expenses.find((expense) => expense.id === expenseId);
+    if (expenseToEdit) {
+      navigation.navigate('EditarDespesa', { despesa: expenseToEdit });
+    }
+  };
+
+
+  const handleDeleteExpense = async (expenseId) => {
+    if (selectedExpense) {
+      try {
+        await deleteDoc(doc(db, 'user', user?.uid, 'despesas', expenseId));
+        console.log('Despesa excluída:', expenseId);
+        // Atualize a lista de despesas após excluir
+        const updatedExpenses = expenses.filter((expense) => expense.id !== expenseId);
+        setExpenses(updatedExpenses);
+        setSelectedExpense(null); // Limpar a despesa selecionada após excluir
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
   const renderExpenseItem = ({ item }) => (
-    <TouchableOpacity style={styles.expenseItem} onPress={() => handleExpensePress(item)}>
+    <TouchableOpacity
+      style={styles.expenseItem}
+      onPress={() => setSelectedExpense(item)} // Defina a despesa selecionada quando o item for pressionado
+    >
       <Text style={styles.expenseTitle}>{item.nome}</Text>
       <Text style={styles.expenseAmount}>R$ {item.valor.toFixed(2)}</Text>
     </TouchableOpacity>
   );
 
-  const handleExpensePress = (expense) => {
-    setSelectedExpense(expense);
-    setShowModal(true);
-  };
-
-  const handleExpenseDelete = async () => {
-    setShowModal(false);
-    setLoading(true);
-    try {
-      await deleteDoc(doc(db, 'user', user?.uid, 'despesas', selectedExpense.id));
-      const updatedExpenses = expenses.filter((e) => e.id !== selectedExpense.id);
-      setExpenses(updatedExpenses);
-      const total = updatedExpenses.reduce((acc, cur) => acc + cur.valor, 0);
-      setTotalDespesas(total);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <NativeBaseProvider>
-      <View style={[styles.container, { backgroundColor: 'blue', height: 30 }]}>
-        <Text>Lista de despesas</Text>
-        <Text>Total despesas: R$ {totalDespesas.toFixed(2)}</Text>
+      <View style={styles.container}>
+        <Text style={styles.totalDespesas}>Total de Despesas: R$ {totalDespesas.toFixed(2)}</Text>
       </View>
       <View style={styles.container}>
         <View style={styles.expenseListContainer}>
           <FlatList
             data={expenses}
-            renderItem={renderExpenseItem}
             keyExtractor={(item) => item.id}
+            renderItem={renderExpenseItem}
             ListEmptyComponent={<Text>Nenhuma despesa encontrada</Text>}
           />
           <View style={styles.topSection}>
@@ -101,29 +102,36 @@ const ListagemDespesaScreen = () => {
           </View>
         </View>
       </View>
-
-      <Dialog
-        visible={showModal}
-        onTouchOutside={() => setShowModal(false)}
-        dialogStyle={styles.dialogContainer}
-      >
-        {selectedExpense && (
-          <>
-            <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
-            <Text style={styles.expenseValue}>R$ {selectedExpense.valor.toFixed(2)}</Text>
-            <Text style={styles.expenseDescription}>{selectedExpense.descricao}</Text>
-            <Button
-              style={styles.deleteButton}
-              onPress={handleExpenseDelete}
-              disabled={loading}
-              colorScheme="red"
-            >
-              Excluir
-            </Button>
-            {loading && <Text>Excluindo despesa...</Text>}
-          </>
-        )}
-      </Dialog>
+      {/* Verifique se a despesa selecionada existe antes de exibir o pop-up */}
+      {selectedExpense && (
+        <View style={styles.dialogContainer}>
+          <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
+          <Text style={styles.expenseValue}>Valor: R$ {selectedExpense.valor.toFixed(2)}</Text>
+          <Text style={styles.expenseDescription}>{selectedExpense.descricao}</Text>
+          <Text style={styles.expenseDate}>Data: {selectedExpense.data}</Text>
+          <Button
+            style={[styles.button, styles.deleteButton]}
+            onPress={() => handleDeleteExpense(selectedExpense.id)}
+            colorScheme="red"
+          >
+            Excluir
+          </Button>
+          <Button
+            style={[styles.button, styles.editButton]}
+            onPress={() => handleEditExpense(selectedExpense.id)}
+            colorScheme="blue"
+          >
+            Editar
+          </Button>
+          <Button
+            style={[styles.button, styles.closeButton]}
+            onPress={() => setSelectedExpense(null)}
+            colorScheme="gray"
+          >
+            Fechar
+          </Button>
+        </View>
+      )}
     </NativeBaseProvider>
   );
 };
@@ -134,6 +142,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8e9eb',
     paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  totalDespesas: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: 'black',
   },
   topSection: {
     flexDirection: 'row',
@@ -177,21 +191,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: 'black',
   },
   expenseValue: {
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: 'black',
   },
   expenseDescription: {
     fontSize: 14,
     marginBottom: 16,
+    color: 'black',
   },
-  deleteButton: {
+  expenseDate: {
+    fontSize: 14,
+    marginBottom: 24,
+    color: 'black',
+  },
+  button: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
-    alignSelf: 'flex-end',
+    marginBottom: 8,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+  },
+  editButton: {
+    backgroundColor: 'blue',
+  },
+  closeButton: {
+    backgroundColor: 'gray',
   },
 });
 

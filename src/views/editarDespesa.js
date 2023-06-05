@@ -1,9 +1,9 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
-import { useAuthentication } from '../utils/authenticator';
 import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
+import { useAuthentication } from '../utils/authenticator';
 
 const EditarDespesaScreen = ({ route, navigation }) => {
   const { despesa } = route.params || {};
@@ -39,7 +39,7 @@ const EditarDespesaScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      {despesa ? (
+      {despesa && despesa.nome ? (
         <>
           <Text style={styles.label}>Nome:</Text>
           <TextInput

@@ -30,6 +30,7 @@ const AuthRoutes: React.FC = () =>{
             <Screen name="Charts" component={ChartScreen} options={{ headerShown:false }} />
             <Screen name="Perfil" component={PerfilScreen} options={{ headerShown:false }} />
             <Screen name="DetalheDespesa" component={DetalheDespesaScreen} options={{ headerShown:false }} />
+            <Screen name="EditarDespesa" component={DetalheDespesaScreen} options={{ headerShown:false }} />
         </Navigator>
     );
 };
