@@ -2,11 +2,11 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuthentication } from '../utils/authenticator';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 
-const EditarDespesaScreen = ({ route, navigation }) => {
-  const { despesa } = route.params || {};
+const EditarReceitaScreen = ({ route, navigation }) => {
+  const { receita } = route.params || {};
 
   const [nome, setNome] = useState('');
   const [valor, setValor] = useState('');
@@ -16,34 +16,34 @@ const EditarDespesaScreen = ({ route, navigation }) => {
   const { user } = useAuthentication();
 
   useEffect(() => {
-    if (despesa) {
-      setNome(despesa.nome);
-      setValor(despesa.valor.toString());
-      setDescricao(despesa.descricao);
-      setCategoria(despesa.categoria);
-      setData(despesa.data);
+    if (receita) {
+      setNome(receita.nome);
+      setValor(receita.valor.toString());
+      setDescricao(receita.descricao);
+      setCategoria(receita.categoria);
+      setData(receita.data);
     }
-  }, [despesa]);
+  }, [receita]);
 
   const handleSave = async () => {
     try {
-      const expenseRef = doc(db, 'user', user?.uid, 'despesas', despesa.id);
-      await updateDoc(expenseRef, {
+      const revenueRef = doc(db, 'user', user?.uid, 'receita', receita.id);
+      await updateDoc(revenueRef, {
         nome: nome,
         valor: parseFloat(valor),
         descricao: descricao,
         categoria: categoria,
         data: data,
       });
-      const updatedDespesa = {
-        ...despesa,
+      const updatedReceita = {
+        ...receita,
         nome: nome,
         valor: parseFloat(valor),
         descricao: descricao,
         categoria: categoria,
         data: data,
       };
-      navigation.navigate('Despesas', { despesa: updatedDespesa });
+      navigation.navigate('Receitas', { receita: updatedReceita });
     } catch (error) {
       console.log(error);
     }
@@ -51,7 +51,7 @@ const EditarDespesaScreen = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      {despesa ? (
+      {receita ? (
         <>
           <Text style={styles.label}>Nome:</Text>
           <TextInput
@@ -94,7 +94,7 @@ const EditarDespesaScreen = ({ route, navigation }) => {
           </TouchableOpacity>
         </>
       ) : (
-        <Text>Não foi possível carregar os detalhes da despesa.</Text>
+        <Text>Nenhuma receita selecionada para edição</Text>
       )}
     </View>
   );
@@ -112,23 +112,22 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   input: {
-    height: 40,
-    borderColor: '#ccc',
     borderWidth: 1,
+    borderColor: '#ddd',
     borderRadius: 4,
-    paddingHorizontal: 8,
+    padding: 8,
     marginBottom: 16,
   },
   saveButton: {
-    backgroundColor: '#2196F3',
+    backgroundColor: 'blue',
     padding: 12,
-    borderRadius: 8,
+    borderRadius: 4,
     alignItems: 'center',
   },
   saveButtonText: {
-    color: '#FFFFFF',
+    color: 'white',
     fontWeight: 'bold',
   },
 });
 
-export default EditarDespesaScreen;
+export default EditarReceitaScreen;

@@ -2,24 +2,21 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { collection, query, where, getDocs, deleteDoc } from 'firebase/firestore';
+import { collection, query, getDocs, deleteDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 import { doc } from 'firebase/firestore';
-import Dialog from 'react-native-popup-dialog';
 import { NativeBaseProvider, Button } from 'native-base';
 
 const ListagemReceitaScreen = () => {
-  const [revenues, setrevenues] = useState([]);
-  const [totalreceitas, setTotalreceitas] = useState(0);
-  const [selectedrevenue, setSelectedrevenue] = useState(null);
-  const [showModal, setShowModal] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [revenues, setRevenues] = useState([]);
+  const [totalReceitas, setTotalReceitas] = useState(0);
+  const [selectedRevenue, setSelectedRevenue] = useState(null); // Variável para armazenar a receita selecionada
   const navigation = useNavigation();
   const { user } = useAuthentication();
 
   useEffect(() => {
-    const fetchrevenues = async () => {
+    const fetchRevenues = async () => {
       console.log('User:', user);
       console.log('User ID:', user?.uid);
 
@@ -36,56 +33,64 @@ const ListagemReceitaScreen = () => {
           total += revenue.valor;
         });
         console.log('revenue List:', revenueList);
-        setrevenues(revenueList);
-        setTotalreceitas(total);
+        setRevenues(revenueList);
+        setTotalReceitas(total);
       } catch (error) {
         console.log(error);
       }
     };
 
-    fetchrevenues();
+    fetchRevenues();
   }, [user, user?.uid]);
 
-  const renderrevenueItem = ({ item }) => (
-    <TouchableOpacity style={styles.revenueItem} onPress={() => handlerevenuePress(item)}>
+  
+
+  const handleEditRevenue = (revenueId) => {
+    const revenueToEdit = revenues.find((revenue) => revenue.id === revenueId);
+    if (revenueToEdit) {
+      setSelectedRevenue(revenueToEdit); // Defina a receita selecionada
+      navigation.navigate('EditarReceita', { receita: revenueToEdit });
+    }
+  };
+
+
+
+  const handleDeleterevenue = async (revenueId) => {
+    if (selectedRevenue) {
+      try {
+        await deleteDoc(doc(db, 'user', user?.uid, 'receitas', revenueId));
+        console.log('receita excluída:', revenueId);
+        // Atualize a lista de receitas após excluir
+        const updatedrevenues = revenues.filter((revenue) => revenue.id !== revenueId);
+        setRevenues(updatedrevenues);
+        setSelectedRevenue(null); // Limpar a receita selecionada após excluir
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
+
+  const renderRevenueItem = ({ item }) => (
+    <TouchableOpacity
+      style={styles.revenueItem}
+      onPress={() => setSelectedRevenue(item)} // Defina a receita selecionada quando o item for pressionado
+    >
       <Text style={styles.revenueTitle}>{item.nome}</Text>
       <Text style={styles.revenueAmount}>R$ {item.valor.toFixed(2)}</Text>
     </TouchableOpacity>
   );
 
-  const handlerevenuePress = (revenue) => {
-    setSelectedrevenue(revenue);
-    setShowModal(true);
-  };
-
-  const handlerevenueDelete = async () => {
-    setShowModal(false);
-    setLoading(true);
-    try {
-      await deleteDoc(doc(db, 'user', user?.uid, 'receitas', selectedrevenue.id));
-      const updatedrevenues = revenues.filter((e) => e.id !== selectedrevenue.id);
-      setrevenues(updatedrevenues);
-      const total = updatedrevenues.reduce((acc, cur) => acc + cur.valor, 0);
-      setTotalreceitas(total);
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   return (
     <NativeBaseProvider>
-      <View style={[styles.container, { backgroundColor: 'blue', height: 30 }]}>
-        <Text>Lista de receitas</Text>
-        <Text>Total receitas: R$ {totalreceitas.toFixed(2)}</Text>
+      <View style={styles.container}>
+        <Text style={styles.totalreceitas}>Total de receitas: R$ {totalReceitas.toFixed(2)}</Text>
       </View>
       <View style={styles.container}>
         <View style={styles.revenueListContainer}>
           <FlatList
             data={revenues}
-            renderItem={renderrevenueItem}
             keyExtractor={(item) => item.id}
+            renderItem={renderRevenueItem}
             ListEmptyComponent={<Text>Nenhuma receita encontrada</Text>}
           />
           <View style={styles.topSection}>
@@ -94,35 +99,44 @@ const ListagemReceitaScreen = () => {
               onPress={() => {
                 navigation.navigate('CadastroReceita');
               }}
+              colorScheme="teal"
             >
               Adicionar receita
             </Button>
           </View>
         </View>
       </View>
-
-      <Dialog
-        visible={showModal}
-        onTouchOutside={() => setShowModal(false)}
-        dialogStyle={styles.dialogContainer}
-      >
-        {selectedrevenue && (
-          <>
-            <Text style={styles.revenueName}>{selectedrevenue.nome}</Text>
-            <Text style={styles.revenueValue}>R$ {selectedrevenue.valor.toFixed(2)}</Text>
-            <Text style={styles.revenueDescription}>{selectedrevenue.descricao}</Text>
-            <Button
-              style={styles.deleteButton}
-              onPress={handlerevenueDelete}
-              disabled={loading}
-              colorScheme="red"
-            >
-              Excluir
-            </Button>
-            {loading && <Text>Excluindo receita...</Text>}
-          </>
-        )}
-      </Dialog>
+      {/* Verifique se a receita selecionada existe antes de exibir o pop-up */}
+      {selectedRevenue && (
+        <View style={styles.dialogContainer}>
+          <Text style={styles.revenueName}>{selectedRevenue.nome}</Text>
+          <Text style={styles.revenueValue}>Valor: R$ {selectedRevenue.valor.toFixed(2)}</Text>
+          <Text style={styles.revenueDescription}>{selectedRevenue.descricao}</Text>
+          <Text style={styles.revenueDate}>Categoria: {selectedRevenue.categoria}</Text>
+          <Text style={styles.revenueDate}>Data: {selectedRevenue.data}</Text>
+          <Button
+            style={[styles.button, styles.deleteButton]}
+            onPress={() => handleDeleterevenue(selectedRevenue.id)}
+            colorScheme="red"
+          >
+            Excluir
+          </Button>
+          <Button
+            style={[styles.button, styles.editButton]}
+            onPress={() => handleEditRevenue(selectedRevenue.id)}
+            colorScheme="blue"
+          >
+            Editar
+          </Button>
+          <Button
+            style={[styles.button, styles.closeButton]}
+            onPress={() => setSelectedRevenue(null)}
+            colorScheme="gray"
+          >
+            Fechar
+          </Button>
+        </View>
+      )}
     </NativeBaseProvider>
   );
 };
@@ -133,6 +147,12 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8e9eb',
     paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  totalreceitas: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 16,
+    color: 'black',
   },
   topSection: {
     flexDirection: 'row',
@@ -145,7 +165,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     borderRadius: 16,
     marginRight: 60,
-    backgroundColor: '#79d6f7',
   },
   revenueListContainer: {
     flex: 1,
@@ -177,21 +196,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: 'black',
   },
   revenueValue: {
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 16,
+    color: 'black',
   },
   revenueDescription: {
     fontSize: 14,
     marginBottom: 16,
+    color: 'black',
   },
-  deleteButton: {
+  revenueDate: {
+    fontSize: 14,
+    marginBottom: 24,
+    color: 'black',
+  },
+  button: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 8,
-    alignSelf: 'flex-end',
+    marginBottom: 8,
+  },
+  deleteButton: {
+    backgroundColor: 'red',
+  },
+  editButton: {
+    backgroundColor: 'blue',
+  },
+  closeButton: {
+    backgroundColor: 'gray',
   },
 });
 

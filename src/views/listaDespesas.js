@@ -46,9 +46,10 @@ const ListagemDespesaScreen = () => {
   const handleEditExpense = (expenseId) => {
     const expenseToEdit = expenses.find((expense) => expense.id === expenseId);
     if (expenseToEdit) {
-      navigation.navigate('EditarDespesa', { despesa: expenseToEdit });
+      navigation.navigate('EditarDespesa', { despesa: expenseToEdit }); // Adicionado este trecho
     }
   };
+
 
 
   const handleDeleteExpense = async (expenseId) => {
@@ -106,8 +107,8 @@ const ListagemDespesaScreen = () => {
       {selectedExpense && (
         <View style={styles.dialogContainer}>
           <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
-          <Text style={styles.expenseValue}>Valor: R$ {selectedExpense.valor.toFixed(2)}</Text>
-          <Text style={styles.expenseDescription}>{selectedExpense.descricao}</Text>
+          <Text style={styles.expenseValue}>Valor:  R${selectedExpense.valor.toFixed(2)}</Text>
+          <Text style={styles.expenseDescription}>Categoria: {selectedExpense.categoria}</Text>
           <Text style={styles.expenseDate}>Data: {selectedExpense.data}</Text>
           <Button
             style={[styles.button, styles.deleteButton]}
