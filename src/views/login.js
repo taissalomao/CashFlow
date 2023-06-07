@@ -12,6 +12,7 @@ import { signInWithEmailAndPassword } from 'firebase/auth';
 function LoginScreen() {
   const [user, setUser] = useState({ email: '', senha: '' });
   const [showPassword, setShowPassword] = useState(false);
+  const [error, setError] = useState('');
   const authFirebase = getAuth();
 
   async function login() {
@@ -26,6 +27,8 @@ function LoginScreen() {
         user.senha
       ).then((res) => {
         navigation.navigate('Home');
+      }).catch((error) => {
+        setError('Senha incorreta. Tente novamente.');
       });
     } catch (error) {
       console.log(error);
@@ -69,8 +72,11 @@ function LoginScreen() {
                 </Button>
               }
             />
+            {error !== '' && (
+              <Text style={styles.errorText}>{error}</Text>
+            )}
             <Text style={styles.linkText}>
-              <Link onPress={() => navigation.navigate('Cadastro')}>
+              <Link onPress={() => navigation.navigate('CadastroUser')}>
                 Cadastre-se aqui
               </Link>
             </Text>
@@ -131,6 +137,11 @@ const styles = StyleSheet.create({
   },
   loginButton: {
     marginBottom: 10,
+  },
+  errorText: {
+    color: 'red',
+    marginTop: 5,
+    textAlign: 'right',
   },
 });
 
