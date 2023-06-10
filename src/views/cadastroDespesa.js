@@ -1,11 +1,18 @@
 /* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Button, Input, Text, NativeBaseProvider, FormControl } from 'native-base';
-import { useNavigation } from '@react-navigation/native';
-import { collection, addDoc } from 'firebase/firestore';
-import { db } from '../config/firebaseConfig';
-import { useAuthentication } from '../utils/authenticator';
+import React, {useState} from 'react';
+import {View, StyleSheet} from 'react-native';
+import {
+  Button,
+  Input,
+  Text,
+  NativeBaseProvider,
+  FormControl,
+  Box,
+} from 'native-base';
+import {useNavigation} from '@react-navigation/native';
+import {collection, addDoc} from 'firebase/firestore';
+import {db} from '../config/firebaseConfig';
+import {useAuthentication} from '../utils/authenticator';
 
 const CadastroDespesaScreen = () => {
   const navigation = useNavigation();
@@ -15,10 +22,27 @@ const CadastroDespesaScreen = () => {
   const [descricaoDespesa, setDescricaoDespesa] = useState('');
   const [categoriaDespesa, setCategoriaDespesa] = useState('');
   const [dataDespesa, setDataDespesa] = useState('');
+  const [isDateFocused, setIsDateFocused] = useState(false);
+
+  const formatarData = (data) => {
+    const numericData = data.replace(/[^\d]/g, '');
+    let formattedData = '';
+
+    if (numericData.length > 2) {
+      formattedData += numericData.substr(0, 2) + '/';
+    }
+    if (numericData.length > 4) {
+      formattedData += numericData.substr(2, 2) + '/';
+    }
+    if (numericData.length > 6) {
+      formattedData += numericData.substr(4, 4);
+    }
+
+    return formattedData;
+  };
 
   const handleAddExpense = async () => {
     try {
-      // Crie um novo documento na coleção "despesas" para o usuário atual
       const expensesRef = collection(db, 'user', user?.uid, 'despesas');
       await addDoc(expensesRef, {
         nome: nomeDespesa,
@@ -28,11 +52,18 @@ const CadastroDespesaScreen = () => {
         data: dataDespesa,
       });
 
-      // Navegue de volta para a tela de listagem de despesas
       navigation.navigate('Despesas');
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handleDateFocus = () => {
+    setIsDateFocused(true);
+  };
+
+  const handleDateBlur = () => {
+    setIsDateFocused(false);
   };
 
   return (
@@ -90,10 +121,15 @@ const CadastroDespesaScreen = () => {
             Data:
           </FormControl.Label>
           <Input
-            type="date"
             variant="outline"
-            value={dataDespesa}
+            value={formatarData(dataDespesa)}
             onChangeText={setDataDespesa}
+            placeholder="DD/MM/YYYY"
+            keyboardType="numeric"
+            paddingLeft={2}
+            paddingRight={2}
+            onFocus={handleDateFocus}
+            onBlur={handleDateBlur}
           />
         </FormControl>
 
@@ -104,6 +140,7 @@ const CadastroDespesaScreen = () => {
     </NativeBaseProvider>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
