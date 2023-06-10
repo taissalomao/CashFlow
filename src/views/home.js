@@ -70,8 +70,8 @@ export default function HomeScreen() {
         }
 
         const userDocRef = doc(db, 'user', user.uid);
-        const receitasRef = collection(userDocRef, 'receitas');
-        const q = query(receitasRef);
+        const revenuesRef = collection(userDocRef, 'receitas');
+        const q = query(revenuesRef);
         const querySnapshot = await getDocs(q);
         let total = 0;
         querySnapshot.forEach((doc) => {

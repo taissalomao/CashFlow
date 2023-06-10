@@ -1,30 +1,87 @@
-/* eslint-disable prettier/prettier */
-import React, { useState } from 'react';
+/* eslint-disable no-unused-vars *//* eslint-disable prettier/prettier */
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Input, Text, NativeBaseProvider, FormControl } from 'native-base';
+import { Button, Input, Text, NativeBaseProvider, FormControl, Select } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-import { collection, addDoc } from 'firebase/firestore';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 
-const CadastroDespesaScreen = () => {
+const CadastroReceitaScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuthentication();
-  const [nomeDespesa, setNomeDespesa] = useState('');
-  const [valorDespesa, setValorDespesa] = useState('');
-  const [descricaoDespesa, setDescricaoDespesa] = useState('');
-  const [categoriaDespesa, setCategoriaDespesa] = useState('');
-  const [dataDespesa, setDataDespesa] = useState('');
+  const [nomeReceita, setNomeReceita] = useState('');
+  const [valorReceita, setValorReceita] = useState('');
+  const [descricaoReceita, setDescricaoReceita] = useState('');
+  const [categorias, setCategorias] = useState([]);
+  const [categoriaReceita, setCategoriaReceita] = useState('');
+  const [novaCategoria, setNovaCategoria] = useState('');
+  const [dataReceita, setDataReceita] = useState('');
+  const [isDateFocused, setIsDateFocused] = useState(false);
 
-  const handleAddrevenue = async () => {
+  useEffect(() => {
+    carregarCategoriasReceitas();
+  }, []);
+
+  const carregarCategoriasReceitas = async () => {
     try {
-      const revenuesRef = collection(db, 'user', user?.uid, 'receitas');
-      await addDoc(revenuesRef, {
-        nome: nomeDespesa,
-        valor: parseFloat(valorDespesa),
+      const categoriasRef = collection(db, 'categoriasReceitas'); // Altere 'categorias' para o nome da sua coleção no banco de dados
+      const categoriasSnapshot = await getDocs(categoriasRef);
+      const categoriasData = categoriasSnapshot.docs.map((doc) => doc.data());
+      setCategorias(categoriasData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const formatarData = (data) => {
+    const numericData = data.replace(/[^\d]/g, '');
+    let formattedData = '';
+
+    if (numericData.length > 2) {
+      formattedData += numericData.substr(0, 2) + '/';
+    }
+    if (numericData.length > 4) {
+      formattedData += numericData.substr(2, 2) + '/';
+    }
+    if (numericData.length > 6) {
+      formattedData += numericData.substr(4, 4);
+    }
+
+    return formattedData;
+  };
+
+  const handleAddRevenue = async () => {
+    try {
+      const revenueRef = collection(db, 'user', user?.uid, 'receitas');
+      await addDoc(revenueRef, {
+        nome: nomeReceita,
+        valor: parseFloat(valorReceita),
+        descricao: descricaoReceita,
+        categoria: categoriaReceita,
+        data: dataReceita,
       });
 
       navigation.navigate('Receitas');
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleDateFocus = () => {
+    setIsDateFocused(true);
+  };
+
+  const handleDateBlur = () => {
+    setIsDateFocused(false);
+  };
+
+  const handleNovaCategoriaReceita = async () => {
+    try {
+      const categoriasRef = collection(db, 'categoriasReceitas'); // Altere 'categorias' para o nome da sua coleção no banco de dados
+      await addDoc(categoriasRef, { nome: novaCategoria });
+      setNovaCategoria('');
+      carregarCategoriasReceitas();
     } catch (error) {
       console.log(error);
     }
@@ -41,8 +98,8 @@ const CadastroDespesaScreen = () => {
           </FormControl.Label>
           <Input
             variant="outline"
-            value={nomeDespesa}
-            onChangeText={setNomeDespesa}
+            value={nomeReceita}
+            onChangeText={setNomeReceita}
           />
         </FormControl>
 
@@ -52,8 +109,8 @@ const CadastroDespesaScreen = () => {
           </FormControl.Label>
           <Input
             variant="outline"
-            value={descricaoDespesa}
-            onChangeText={setDescricaoDespesa}
+            value={descricaoReceita}
+            onChangeText={setDescricaoReceita}
           />
         </FormControl>
 
@@ -63,8 +120,8 @@ const CadastroDespesaScreen = () => {
           </FormControl.Label>
           <Input
             variant="outline"
-            value={valorDespesa}
-            onChangeText={setValorDespesa}
+            value={valorReceita}
+            onChangeText={setValorReceita}
             keyboardType="numeric"
           />
         </FormControl>
@@ -73,11 +130,24 @@ const CadastroDespesaScreen = () => {
           <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
             Categoria:
           </FormControl.Label>
+          <Select
+            placeholder="Selecione uma categoria"
+            selectedValue={categoriaReceita}
+            minWidth={200}
+            accessibilityLabel="Selecione a categoria da Receita"
+            onValueChange={(value) => setCategoriaReceita(value)}
+          >
+            {categorias.map((categoria) => (
+              <Select.Item key={categoria.nome} value={categoria.nome} label={categoria.nome} />
+            ))}
+          </Select>
           <Input
             variant="outline"
-            value={categoriaDespesa}
-            onChangeText={setCategoriaDespesa}
+            value={novaCategoria}
+            onChangeText={setNovaCategoria}
+            placeholder="Nova categoria"
           />
+          <Button onPress={handleNovaCategoriaReceita}>Adicionar Categoria</Button>
         </FormControl>
 
         <FormControl>
@@ -85,14 +155,19 @@ const CadastroDespesaScreen = () => {
             Data:
           </FormControl.Label>
           <Input
-            type="date"
             variant="outline"
-            value={dataDespesa}
-            onChangeText={setDataDespesa}
+            value={formatarData(dataReceita)}
+            onChangeText={setDataReceita}
+            placeholder="DD/MM/YYYY"
+            keyboardType="numeric"
+            paddingLeft={2}
+            paddingRight={2}
+            onFocus={handleDateFocus}
+            onBlur={handleDateBlur}
           />
         </FormControl>
 
-        <Button style={styles.addButton} onPress={handleAddrevenue}>
+        <Button style={styles.addButton} onPress={handleAddRevenue}>
           <Text style={styles.addButtonText}>Adicionar Receita</Text>
         </Button>
       </View>
@@ -127,4 +202,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CadastroDespesaScreen;
+export default CadastroReceitaScreen;

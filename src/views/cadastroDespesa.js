@@ -1,18 +1,11 @@
 /* eslint-disable prettier/prettier */
-import React, {useState} from 'react';
-import {View, StyleSheet} from 'react-native';
-import {
-  Button,
-  Input,
-  Text,
-  NativeBaseProvider,
-  FormControl,
-  Box,
-} from 'native-base';
-import {useNavigation} from '@react-navigation/native';
-import {collection, addDoc} from 'firebase/firestore';
-import {db} from '../config/firebaseConfig';
-import {useAuthentication} from '../utils/authenticator';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet } from 'react-native';
+import { Button, Input, Text, NativeBaseProvider, FormControl, Box, Select } from 'native-base';
+import { useNavigation } from '@react-navigation/native';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { db } from '../config/firebaseConfig';
+import { useAuthentication } from '../utils/authenticator';
 
 const CadastroDespesaScreen = () => {
   const navigation = useNavigation();
@@ -20,9 +13,26 @@ const CadastroDespesaScreen = () => {
   const [nomeDespesa, setNomeDespesa] = useState('');
   const [valorDespesa, setValorDespesa] = useState('');
   const [descricaoDespesa, setDescricaoDespesa] = useState('');
+  const [categorias, setCategorias] = useState([]);
   const [categoriaDespesa, setCategoriaDespesa] = useState('');
+  const [novaCategoria, setNovaCategoria] = useState('');
   const [dataDespesa, setDataDespesa] = useState('');
   const [isDateFocused, setIsDateFocused] = useState(false);
+
+  useEffect(() => {
+    carregarCategorias();
+  }, []);
+
+  const carregarCategorias = async () => {
+    try {
+      const categoriasRef = collection(db, 'categorias'); // Altere 'categorias' para o nome da sua coleção no banco de dados
+      const categoriasSnapshot = await getDocs(categoriasRef);
+      const categoriasData = categoriasSnapshot.docs.map((doc) => doc.data());
+      setCategorias(categoriasData);
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const formatarData = (data) => {
     const numericData = data.replace(/[^\d]/g, '');
@@ -64,6 +74,17 @@ const CadastroDespesaScreen = () => {
 
   const handleDateBlur = () => {
     setIsDateFocused(false);
+  };
+
+  const handleNovaCategoria = async () => {
+    try {
+      const categoriasRef = collection(db, 'categorias'); // Altere 'categorias' para o nome da sua coleção no banco de dados
+      await addDoc(categoriasRef, { nome: novaCategoria });
+      setNovaCategoria('');
+      carregarCategorias();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -109,11 +130,24 @@ const CadastroDespesaScreen = () => {
           <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
             Categoria:
           </FormControl.Label>
+          <Select
+            placeholder="Selecione uma categoria"
+            selectedValue={categoriaDespesa}
+            minWidth={200}
+            accessibilityLabel="Selecione a categoria da despesa"
+            onValueChange={(value) => setCategoriaDespesa(value)}
+          >
+            {categorias.map((categoria) => (
+              <Select.Item key={categoria.nome} value={categoria.nome} label={categoria.nome} />
+            ))}
+          </Select>
           <Input
             variant="outline"
-            value={categoriaDespesa}
-            onChangeText={setCategoriaDespesa}
+            value={novaCategoria}
+            onChangeText={setNovaCategoria}
+            placeholder="Nova categoria"
           />
+          <Button onPress={handleNovaCategoria}>Adicionar Categoria</Button>
         </FormControl>
 
         <FormControl>
@@ -140,7 +174,6 @@ const CadastroDespesaScreen = () => {
     </NativeBaseProvider>
   );
 };
-
 
 const styles = StyleSheet.create({
   container: {

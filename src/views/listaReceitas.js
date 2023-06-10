@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable no-shadow *//* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -32,7 +32,7 @@ const ListagemReceitaScreen = () => {
           revenueList.push(revenue);
           total += revenue.valor;
         });
-        console.log('revenue List:', revenueList);
+        console.log('Revenue List:', revenueList);
         setRevenues(revenueList);
         setTotalReceitas(total);
       } catch (error) {
@@ -43,26 +43,23 @@ const ListagemReceitaScreen = () => {
     fetchRevenues();
   }, [user, user?.uid]);
 
-  
-
   const handleEditRevenue = (revenueId) => {
     const revenueToEdit = revenues.find((revenue) => revenue.id === revenueId);
     if (revenueToEdit) {
-      setSelectedRevenue(revenueToEdit); // Defina a receita selecionada
-      navigation.navigate('EditarReceita', { receita: revenueToEdit });
+      navigation.navigate('EditarReceita', { receita: revenueToEdit }); // Adicionado este trecho
     }
   };
 
 
 
-  const handleDeleterevenue = async (revenueId) => {
+  const handleDeleteRevenue = async (revenueId) => {
     if (selectedRevenue) {
       try {
         await deleteDoc(doc(db, 'user', user?.uid, 'receitas', revenueId));
-        console.log('receita excluída:', revenueId);
+        console.log('Receita excluída:', revenueId);
         // Atualize a lista de receitas após excluir
-        const updatedrevenues = revenues.filter((revenue) => revenue.id !== revenueId);
-        setRevenues(updatedrevenues);
+        const updatedRevenues = revenues.filter((revenue) => revenue.id !== revenueId);
+        setRevenues(updatedRevenues);
         setSelectedRevenue(null); // Limpar a receita selecionada após excluir
       } catch (error) {
         console.log(error);
@@ -83,7 +80,7 @@ const ListagemReceitaScreen = () => {
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <Text style={styles.totalreceitas}>Total de receitas: R$ {totalReceitas.toFixed(2)}</Text>
+        <Text style={styles.totalReceitas}>Total de Receitas: R$ {totalReceitas.toFixed(2)}</Text>
       </View>
       <View style={styles.container}>
         <View style={styles.revenueListContainer}>
@@ -110,13 +107,12 @@ const ListagemReceitaScreen = () => {
       {selectedRevenue && (
         <View style={styles.dialogContainer}>
           <Text style={styles.revenueName}>{selectedRevenue.nome}</Text>
-          <Text style={styles.revenueValue}>Valor: R$ {selectedRevenue.valor.toFixed(2)}</Text>
-          <Text style={styles.revenueDescription}>{selectedRevenue.descricao}</Text>
-          <Text style={styles.revenueDate}>Categoria: {selectedRevenue.categoria}</Text>
+          <Text style={styles.revenueValue}>Valor:  R${selectedRevenue.valor.toFixed(2)}</Text>
+          <Text style={styles.revenueDescription}>Categoria: {selectedRevenue.categoria}</Text>
           <Text style={styles.revenueDate}>Data: {selectedRevenue.data}</Text>
           <Button
             style={[styles.button, styles.deleteButton]}
-            onPress={() => handleDeleterevenue(selectedRevenue.id)}
+            onPress={() => handleDeleteRevenue(selectedRevenue.id)}
             colorScheme="red"
           >
             Excluir
@@ -148,7 +144,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 16,
   },
-  totalreceitas: {
+  totalReceitas: {
     fontSize: 18,
     fontWeight: 'bold',
     marginBottom: 16,

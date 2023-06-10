@@ -1,8 +1,8 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable react-native/no-inline-styles *//* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity } from 'react-native';
 import { useAuthentication } from '../utils/authenticator';
-import { doc, updateDoc, getDoc } from 'firebase/firestore';
+import { doc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 
 const EditarReceitaScreen = ({ route, navigation }) => {
@@ -27,7 +27,7 @@ const EditarReceitaScreen = ({ route, navigation }) => {
 
   const handleSave = async () => {
     try {
-      const revenueRef = doc(db, 'user', user?.uid, 'receita', receita.id);
+      const revenueRef = doc(db, 'user', user?.uid, 'receitas', receita.id);
       await updateDoc(revenueRef, {
         nome: nome,
         valor: parseFloat(valor),
@@ -53,48 +53,48 @@ const EditarReceitaScreen = ({ route, navigation }) => {
     <View style={styles.container}>
       {receita ? (
         <>
-          <Text style={styles.label}>Nome:</Text>
+          <Text style={[styles.label, { color: '#4F4F4F' }]}>Nome:</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#A9A9A9' }]}
             value={nome}
             onChangeText={setNome}
           />
 
-          <Text style={styles.label}>Valor:</Text>
+          <Text style={[styles.label, { color: '#4F4F4F' }]}>Valor:</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#A9A9A9' }]}
             value={valor}
             onChangeText={setValor}
             keyboardType="numeric"
           />
 
-          <Text style={styles.label}>Descrição:</Text>
+          <Text style={[styles.label, { color: '#4F4F4F' }]}>Descrição:</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#A9A9A9' }]}
             value={descricao}
             onChangeText={setDescricao}
           />
 
-          <Text style={styles.label}>Categoria:</Text>
+          <Text style={[styles.label, { color: '#4F4F4F' }]}>Categoria:</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#A9A9A9' }]}
             value={categoria}
             onChangeText={setCategoria}
           />
 
-          <Text style={styles.label}>Data:</Text>
+          <Text style={[styles.label, { color: '#4F4F4F' }]}>Data:</Text>
           <TextInput
-            style={styles.input}
+            style={[styles.input, { color: '#A9A9A9' }]}
             value={data}
             onChangeText={setData}
           />
 
           <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Salvar</Text>
+            <Text style={[styles.saveButtonText, { color: '#4F4F4F' }]}>Salvar</Text>
           </TouchableOpacity>
         </>
       ) : (
-        <Text>Nenhuma receita selecionada para edição</Text>
+        <Text style={{ color: '#4F4F4F' }}>Não foi possível carregar os detalhes da receita.</Text>
       )}
     </View>
   );
@@ -110,22 +110,25 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
+    color: '#4F4F4F',
   },
   input: {
+    height: 40,
+    borderColor: '#ccc',
     borderWidth: 1,
-    borderColor: '#ddd',
     borderRadius: 4,
-    padding: 8,
+    paddingHorizontal: 8,
     marginBottom: 16,
+    color: '#A9A9A9',
   },
   saveButton: {
-    backgroundColor: 'blue',
+    backgroundColor: '#2196F3',
     padding: 12,
-    borderRadius: 4,
+    borderRadius: 8,
     alignItems: 'center',
   },
   saveButtonText: {
-    color: 'white',
+    color: '#4F4F4F',
     fontWeight: 'bold',
   },
 });
