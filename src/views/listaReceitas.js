@@ -1,4 +1,4 @@
-/* eslint-disable no-shadow *//* eslint-disable prettier/prettier */
+/* eslint-disable prettier/prettier */
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, FlatList, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
@@ -9,20 +9,17 @@ import { doc } from 'firebase/firestore';
 import { NativeBaseProvider, Button } from 'native-base';
 
 const ListagemReceitaScreen = () => {
-  const [revenues, setRevenues] = useState([]);
+  const [revenues, setrevenues] = useState([]);
   const [totalReceitas, setTotalReceitas] = useState(0);
-  const [selectedRevenue, setSelectedRevenue] = useState(null); // Variável para armazenar a receita selecionada
+  const [selectedrevenue, setSelectedrevenue] = useState(null);
   const navigation = useNavigation();
   const { user } = useAuthentication();
 
   useEffect(() => {
-    const fetchRevenues = async () => {
-      console.log('User:', user);
-      console.log('User ID:', user?.uid);
-
+    const fetchrevenues = async () => {
       try {
         const userDocRef = doc(db, 'user', user?.uid);
-        const revenuesRef = collection(userDocRef, 'receitas');
+        const revenuesRef = collection(userDocRef, 'Receitas');
         const q = query(revenuesRef);
         const querySnapshot = await getDocs(q);
         const revenueList = [];
@@ -32,45 +29,40 @@ const ListagemReceitaScreen = () => {
           revenueList.push(revenue);
           total += revenue.valor;
         });
-        console.log('Revenue List:', revenueList);
-        setRevenues(revenueList);
+        setrevenues(revenueList);
         setTotalReceitas(total);
       } catch (error) {
         console.log(error);
       }
     };
 
-    fetchRevenues();
+    fetchrevenues();
   }, [user, user?.uid]);
 
-  const handleEditRevenue = (revenueId) => {
+  const handleEditrevenue = (revenueId) => {
     const revenueToEdit = revenues.find((revenue) => revenue.id === revenueId);
     if (revenueToEdit) {
-      navigation.navigate('EditarReceita', { receita: revenueToEdit }); // Adicionado este trecho
+      navigation.navigate('EditarReceita', { Receita: revenueToEdit });
     }
   };
 
-
-
-  const handleDeleteRevenue = async (revenueId) => {
-    if (selectedRevenue) {
+  const handleDeleterevenue = async (revenueId) => {
+    if (selectedrevenue) {
       try {
-        await deleteDoc(doc(db, 'user', user?.uid, 'receitas', revenueId));
-        console.log('Receita excluída:', revenueId);
-        // Atualize a lista de receitas após excluir
-        const updatedRevenues = revenues.filter((revenue) => revenue.id !== revenueId);
-        setRevenues(updatedRevenues);
-        setSelectedRevenue(null); // Limpar a receita selecionada após excluir
+        await deleteDoc(doc(db, 'user', user?.uid, 'Receitas', revenueId));
+        const updatedrevenues = revenues.filter((revenue) => revenue.id !== revenueId);
+        setrevenues(updatedrevenues);
+        setSelectedrevenue(null);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  const renderRevenueItem = ({ item }) => (
+  const renderrevenueItem = ({ item }) => (
     <TouchableOpacity
       style={styles.revenueItem}
-      onPress={() => setSelectedRevenue(item)} // Defina a receita selecionada quando o item for pressionado
+      onPress={() => setSelectedrevenue(item)}
     >
       <Text style={styles.revenueTitle}>{item.nome}</Text>
       <Text style={styles.revenueAmount}>R$ {item.valor.toFixed(2)}</Text>
@@ -80,53 +72,54 @@ const ListagemReceitaScreen = () => {
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <Text style={styles.totalReceitas}>Total de Receitas: R$ {totalReceitas.toFixed(2)}</Text>
-      </View>
-      <View style={styles.container}>
+        <View style={styles.totalReceitasContainer}>
+          <Text style={styles.totalReceitas}>Total de Receitas: R$ {totalReceitas.toFixed(2)}</Text>
+        </View>
+        <View style={styles.separator} />
         <View style={styles.revenueListContainer}>
           <FlatList
             data={revenues}
             keyExtractor={(item) => item.id}
-            renderItem={renderRevenueItem}
-            ListEmptyComponent={<Text>Nenhuma receita encontrada</Text>}
+            renderItem={renderrevenueItem}
+            ListEmptyComponent={<Text style={styles.emptyListText}>Nenhuma Receita encontrada</Text>}
           />
           <View style={styles.topSection}>
-            <Button
-              style={styles.addButton}
-              onPress={() => {
-                navigation.navigate('CadastroReceita');
-              }}
-              colorScheme="teal"
-            >
-              Adicionar receita
-            </Button>
+            <View style={styles.addButtonContainer}>
+              <Button
+                style={styles.addButton}
+                onPress={() => {
+                  navigation.navigate('CadastroReceita');
+                }}
+              >
+                <Text style={styles.addButtonText}>Adicionar Receita</Text>
+              </Button>
+            </View>
           </View>
         </View>
       </View>
-      {/* Verifique se a receita selecionada existe antes de exibir o pop-up */}
-      {selectedRevenue && (
+      {selectedrevenue && (
         <View style={styles.dialogContainer}>
-          <Text style={styles.revenueName}>{selectedRevenue.nome}</Text>
-          <Text style={styles.revenueValue}>Valor:  R${selectedRevenue.valor.toFixed(2)}</Text>
-          <Text style={styles.revenueDescription}>Categoria: {selectedRevenue.categoria}</Text>
-          <Text style={styles.revenueDate}>Data: {selectedRevenue.data}</Text>
+          <Text style={styles.revenueName}>{selectedrevenue.nome}</Text>
+          <Text style={styles.revenueValue}>Valor: R${selectedrevenue.valor.toFixed(2)}</Text>
+          <Text style={styles.revenueDescription}>Categoria: {selectedrevenue.categoria}</Text>
+          <Text style={styles.revenueDate}>Data: {selectedrevenue.data}</Text>
           <Button
             style={[styles.button, styles.deleteButton]}
-            onPress={() => handleDeleteRevenue(selectedRevenue.id)}
+            onPress={() => handleDeleterevenue(selectedrevenue.id)}
             colorScheme="red"
           >
             Excluir
           </Button>
           <Button
             style={[styles.button, styles.editButton]}
-            onPress={() => handleEditRevenue(selectedRevenue.id)}
+            onPress={() => handleEditrevenue(selectedrevenue.id)}
             colorScheme="blue"
           >
             Editar
           </Button>
           <Button
             style={[styles.button, styles.closeButton]}
-            onPress={() => setSelectedRevenue(null)}
+            onPress={() => setSelectedrevenue(null)}
             colorScheme="gray"
           >
             Fechar
@@ -141,29 +134,52 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#e8e9eb',
-    paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  totalReceitasContainer: {
+    backgroundColor: '#66CDAA',
+    padding: 16,
+    marginBottom: 16,
+    width: '100%',
+    height: 80,
   },
   totalReceitas: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
+    color: 'black',
+    textAlign: 'center',
+  },
+  separator: {
+    height: 8,
+  },
+  revenueListContainer: {
+    flex: 1,
+    flexGrow: 1,
+  },
+  emptyListText: {
+    textAlign: 'center',
+    fontSize: 16,
     color: 'black',
   },
   topSection: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     marginBottom: 32,
     marginTop: 16,
+  },
+  addButtonContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
   addButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
-    marginRight: 60,
+    backgroundColor: '#66CDAA',
   },
-  revenueListContainer: {
-    flex: 1,
+  addButtonText: {
+    fontSize: 16,
+    color: 'black',
   },
   revenueItem: {
     flexDirection: 'row',

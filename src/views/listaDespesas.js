@@ -11,15 +11,12 @@ import { NativeBaseProvider, Button } from 'native-base';
 const ListagemDespesaScreen = () => {
   const [expenses, setExpenses] = useState([]);
   const [totalDespesas, setTotalDespesas] = useState(0);
-  const [selectedExpense, setSelectedExpense] = useState(null); // Variável para armazenar a despesa selecionada
+  const [selectedExpense, setSelectedExpense] = useState(null);
   const navigation = useNavigation();
   const { user } = useAuthentication();
 
   useEffect(() => {
     const fetchExpenses = async () => {
-      console.log('User:', user);
-      console.log('User ID:', user?.uid);
-
       try {
         const userDocRef = doc(db, 'user', user?.uid);
         const expensesRef = collection(userDocRef, 'despesas');
@@ -32,7 +29,6 @@ const ListagemDespesaScreen = () => {
           expenseList.push(expense);
           total += expense.valor;
         });
-        console.log('Expense List:', expenseList);
         setExpenses(expenseList);
         setTotalDespesas(total);
       } catch (error) {
@@ -46,21 +42,17 @@ const ListagemDespesaScreen = () => {
   const handleEditExpense = (expenseId) => {
     const expenseToEdit = expenses.find((expense) => expense.id === expenseId);
     if (expenseToEdit) {
-      navigation.navigate('EditarDespesa', { despesa: expenseToEdit }); // Adicionado este trecho
+      navigation.navigate('EditarDespesa', { despesa: expenseToEdit });
     }
   };
-
-
 
   const handleDeleteExpense = async (expenseId) => {
     if (selectedExpense) {
       try {
         await deleteDoc(doc(db, 'user', user?.uid, 'despesas', expenseId));
-        console.log('Despesa excluída:', expenseId);
-        // Atualize a lista de despesas após excluir
         const updatedExpenses = expenses.filter((expense) => expense.id !== expenseId);
         setExpenses(updatedExpenses);
-        setSelectedExpense(null); // Limpar a despesa selecionada após excluir
+        setSelectedExpense(null);
       } catch (error) {
         console.log(error);
       }
@@ -70,7 +62,7 @@ const ListagemDespesaScreen = () => {
   const renderExpenseItem = ({ item }) => (
     <TouchableOpacity
       style={styles.expenseItem}
-      onPress={() => setSelectedExpense(item)} // Defina a despesa selecionada quando o item for pressionado
+      onPress={() => setSelectedExpense(item)}
     >
       <Text style={styles.expenseTitle}>{item.nome}</Text>
       <Text style={styles.expenseAmount}>R$ {item.valor.toFixed(2)}</Text>
@@ -80,34 +72,35 @@ const ListagemDespesaScreen = () => {
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <Text style={styles.totalDespesas}>Total de Despesas: R$ {totalDespesas.toFixed(2)}</Text>
-      </View>
-      <View style={styles.container}>
+        <View style={styles.totalDespesasContainer}>
+          <Text style={styles.totalDespesas}>Total de Despesas: R$ {totalDespesas.toFixed(2)}</Text>
+        </View>
+        <View style={styles.separator} />
         <View style={styles.expenseListContainer}>
           <FlatList
             data={expenses}
             keyExtractor={(item) => item.id}
             renderItem={renderExpenseItem}
-            ListEmptyComponent={<Text>Nenhuma despesa encontrada</Text>}
+            ListEmptyComponent={<Text style={styles.emptyListText}>Nenhuma despesa encontrada</Text>}
           />
           <View style={styles.topSection}>
-            <Button
-              style={styles.addButton}
-              onPress={() => {
-                navigation.navigate('CadastroDespesa');
-              }}
-              colorScheme="teal"
-            >
-              Adicionar despesa
-            </Button>
+            <View style={styles.addButtonContainer}>
+              <Button
+                style={styles.addButton}
+                onPress={() => {
+                  navigation.navigate('CadastroDespesa');
+                }}
+              >
+                <Text style={styles.addButtonText}>Adicionar despesa</Text>
+              </Button>
+            </View>
           </View>
         </View>
       </View>
-      {/* Verifique se a despesa selecionada existe antes de exibir o pop-up */}
       {selectedExpense && (
         <View style={styles.dialogContainer}>
           <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
-          <Text style={styles.expenseValue}>Valor:  R${selectedExpense.valor.toFixed(2)}</Text>
+          <Text style={styles.expenseValue}>Valor: R${selectedExpense.valor.toFixed(2)}</Text>
           <Text style={styles.expenseDescription}>Categoria: {selectedExpense.categoria}</Text>
           <Text style={styles.expenseDate}>Data: {selectedExpense.data}</Text>
           <Button
@@ -141,29 +134,52 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#e8e9eb',
-    paddingHorizontal: 16,
     paddingBottom: 16,
+  },
+  totalDespesasContainer: {
+    backgroundColor: '#FA8072',
+    padding: 16,
+    marginBottom: 16,
+    width: '100%',
+    height: 80,
   },
   totalDespesas: {
     fontSize: 18,
     fontWeight: 'bold',
-    marginBottom: 16,
+    color: 'black',
+    textAlign: 'center',
+  },
+  separator: {
+    height: 8,
+  },
+  expenseListContainer: {
+    flex: 1,
+    flexGrow: 1,
+  },
+  emptyListText: {
+    textAlign: 'center',
+    fontSize: 16,
     color: 'black',
   },
   topSection: {
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     marginBottom: 32,
     marginTop: 16,
+  },
+  addButtonContainer: {
+    flex: 1,
+    alignItems: 'center',
   },
   addButton: {
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
-    marginRight: 60,
+    backgroundColor: '#FA8072',
   },
-  expenseListContainer: {
-    flex: 1,
+  addButtonText: {
+    fontSize: 16,
+    color: 'black',
   },
   expenseItem: {
     flexDirection: 'row',
