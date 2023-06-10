@@ -23,6 +23,9 @@ const CadastroDespesaScreen = () => {
       await addDoc(expensesRef, {
         nome: nomeDespesa,
         valor: parseFloat(valorDespesa),
+        descricao: descricaoDespesa,
+        categoria: categoriaDespesa,
+        data: dataDespesa,
       });
 
       // Navegue de volta para a tela de listagem de despesas
