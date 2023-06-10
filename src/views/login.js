@@ -4,10 +4,10 @@ import { View, Text, StyleSheet, Image } from 'react-native';
 import { Button, Input } from 'native-base';
 import { NativeBaseProvider, Link } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-import { getAuth} from 'firebase/auth/react-native';
+import { getAuth } from 'firebase/auth';
 //import Sidebar from '../components/sidebar';
 //import AppBar from '../components/nav';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { signInWithEmailAndPassword, AuthErrorCodes } from 'firebase/auth';
 
 function LoginScreen() {
   const [user, setUser] = useState({ email: '', senha: '' });
@@ -27,10 +27,14 @@ function LoginScreen() {
         user.senha
       ).then((res) => {
         navigation.navigate('Home');
-      }).catch((error) => {
-        setError('Senha incorreta. Tente novamente.');
+      }).catch(() => {
+        if (error.code === 'auth/user-not-found') {
+          setError('Usuário não cadastrado. Por favor, cadastre-se.');
+        } else {
+          setError('Senha incorreta. Tente novamente.');
+        }
       });
-    } catch (error) {
+    } catch (e) {
       console.log(error);
     }
   }
