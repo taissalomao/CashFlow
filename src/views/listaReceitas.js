@@ -9,17 +9,17 @@ import { doc } from 'firebase/firestore';
 import { NativeBaseProvider, Button } from 'native-base';
 
 const ListagemReceitaScreen = () => {
-  const [revenues, setrevenues] = useState([]);
+  const [revenues, setRevenues] = useState([]);
   const [totalReceitas, setTotalReceitas] = useState(0);
-  const [selectedrevenue, setSelectedrevenue] = useState(null);
+  const [selectedRevenue, setSelectedRevenue] = useState(null);
   const navigation = useNavigation();
   const { user } = useAuthentication();
 
   useEffect(() => {
-    const fetchrevenues = async () => {
+    const fetchRevenues = async () => {
       try {
         const userDocRef = doc(db, 'user', user?.uid);
-        const revenuesRef = collection(userDocRef, 'Receitas');
+        const revenuesRef = collection(userDocRef, 'receitas');
         const q = query(revenuesRef);
         const querySnapshot = await getDocs(q);
         const revenueList = [];
@@ -29,40 +29,40 @@ const ListagemReceitaScreen = () => {
           revenueList.push(revenue);
           total += revenue.valor;
         });
-        setrevenues(revenueList);
+        setRevenues(revenueList);
         setTotalReceitas(total);
       } catch (error) {
         console.log(error);
       }
     };
 
-    fetchrevenues();
+    fetchRevenues();
   }, [user, user?.uid]);
 
-  const handleEditrevenue = (revenueId) => {
+  const handleEditRevenue = (revenueId) => {
     const revenueToEdit = revenues.find((revenue) => revenue.id === revenueId);
     if (revenueToEdit) {
       navigation.navigate('EditarReceita', { Receita: revenueToEdit });
     }
   };
 
-  const handleDeleterevenue = async (revenueId) => {
-    if (selectedrevenue) {
+  const handleDeleteRevenue = async (revenueId) => {
+    if (selectedRevenue) {
       try {
-        await deleteDoc(doc(db, 'user', user?.uid, 'Receitas', revenueId));
-        const updatedrevenues = revenues.filter((revenue) => revenue.id !== revenueId);
-        setrevenues(updatedrevenues);
-        setSelectedrevenue(null);
+        await deleteDoc(doc(db, 'user', user?.uid, 'receitas', revenueId));
+        const updatedRevenues = revenues.filter((revenue) => revenue.id !== revenueId);
+        setRevenues(updatedRevenues);
+        setSelectedRevenue(null);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  const renderrevenueItem = ({ item }) => (
+  const renderRevenueItem = ({ item }) => (
     <TouchableOpacity
       style={styles.revenueItem}
-      onPress={() => setSelectedrevenue(item)}
+      onPress={() => setSelectedRevenue(item)}
     >
       <Text style={styles.revenueTitle}>{item.nome}</Text>
       <Text style={styles.revenueAmount}>R$ {item.valor.toFixed(2)}</Text>
@@ -80,7 +80,7 @@ const ListagemReceitaScreen = () => {
           <FlatList
             data={revenues}
             keyExtractor={(item) => item.id}
-            renderItem={renderrevenueItem}
+            renderItem={renderRevenueItem}
             ListEmptyComponent={<Text style={styles.emptyListText}>Nenhuma Receita encontrada</Text>}
           />
           <View style={styles.topSection}>
@@ -97,29 +97,29 @@ const ListagemReceitaScreen = () => {
           </View>
         </View>
       </View>
-      {selectedrevenue && (
+      {selectedRevenue && (
         <View style={styles.dialogContainer}>
-          <Text style={styles.revenueName}>{selectedrevenue.nome}</Text>
-          <Text style={styles.revenueValue}>Valor: R${selectedrevenue.valor.toFixed(2)}</Text>
-          <Text style={styles.revenueDescription}>Categoria: {selectedrevenue.categoria}</Text>
-          <Text style={styles.revenueDate}>Data: {selectedrevenue.data}</Text>
+          <Text style={styles.revenueName}>{selectedRevenue.nome}</Text>
+          <Text style={styles.revenueValue}>Valor: R${selectedRevenue.valor.toFixed(2)}</Text>
+          <Text style={styles.revenueDescription}>Categoria: {selectedRevenue.categoria}</Text>
+          <Text style={styles.revenueDate}>Data: {selectedRevenue.data}</Text>
           <Button
             style={[styles.button, styles.deleteButton]}
-            onPress={() => handleDeleterevenue(selectedrevenue.id)}
+            onPress={() => handleDeleteRevenue(selectedRevenue.id)}
             colorScheme="red"
           >
             Excluir
           </Button>
           <Button
             style={[styles.button, styles.editButton]}
-            onPress={() => handleEditrevenue(selectedrevenue.id)}
+            onPress={() => handleEditRevenue(selectedRevenue.id)}
             colorScheme="blue"
           >
             Editar
           </Button>
           <Button
             style={[styles.button, styles.closeButton]}
-            onPress={() => setSelectedrevenue(null)}
+            onPress={() => setSelectedRevenue(null)}
             colorScheme="gray"
           >
             Fechar

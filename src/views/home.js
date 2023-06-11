@@ -75,8 +75,8 @@ export default function HomeScreen() {
         const querySnapshot = await getDocs(q);
         let total = 0;
         querySnapshot.forEach((doc) => {
-          const receita = doc.data();
-          total += receita.valor;
+          const revenue = doc.data();
+          total += revenue.valor;
         });
         setTotalReceitas(total);
       } catch (error) {
