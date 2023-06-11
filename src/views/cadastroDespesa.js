@@ -1,4 +1,4 @@
-/* eslint-disable prettier/prettier */
+/* eslint-disable no-unused-vars *//* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider, FormControl, Box, Select } from 'native-base';
@@ -18,6 +18,7 @@ const CadastroDespesaScreen = () => {
   const [novaCategoria, setNovaCategoria] = useState('');
   const [dataDespesa, setDataDespesa] = useState('');
   const [isDateFocused, setIsDateFocused] = useState(false);
+  const [mostrarNovaCategoria, setMostrarNovaCategoria] = useState(false);
 
   useEffect(() => {
     carregarCategorias();
@@ -90,86 +91,110 @@ const CadastroDespesaScreen = () => {
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <Text style={styles.teste}>Cadastre a Despesa</Text>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Cadastre a Despesa</Text>
+        </View>
 
-        <FormControl>
-          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
-            Nome:
-          </FormControl.Label>
-          <Input
-            variant="outline"
-            value={nomeDespesa}
-            onChangeText={setNomeDespesa}
-          />
-        </FormControl>
+        <View style={styles.form}>
+          <FormControl>
+            <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+              Nome:
+            </FormControl.Label>
+            <Input
+              variant="outline"
+              value={nomeDespesa}
+              onChangeText={setNomeDespesa}
+              style={styles.input}
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
-            Descrição:
-          </FormControl.Label>
-          <Input
-            variant="outline"
-            value={descricaoDespesa}
-            onChangeText={setDescricaoDespesa}
-          />
-        </FormControl>
+{/*           <FormControl>
+            <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+              Descrição:
+            </FormControl.Label>
+            <Input
+              variant="outline"
+              value={descricaoDespesa}
+              onChangeText={setDescricaoDespesa}
+              style={styles.input}
+            />
+          </FormControl> */}
 
-        <FormControl>
-          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
-            Valor:
-          </FormControl.Label>
-          <Input
-            variant="outline"
-            value={valorDespesa}
-            onChangeText={setValorDespesa}
-            keyboardType="numeric"
-          />
-        </FormControl>
+          <FormControl>
+            <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+              Valor:
+            </FormControl.Label>
+            <Input
+              variant="outline"
+              value={valorDespesa}
+              onChangeText={setValorDespesa}
+              keyboardType="numeric"
+              style={styles.input}
+            />
+          </FormControl>
 
-        <FormControl>
-          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
-            Categoria:
-          </FormControl.Label>
-          <Select
-            placeholder="Selecione uma categoria"
-            selectedValue={categoriaDespesa}
-            minWidth={200}
-            accessibilityLabel="Selecione a categoria da despesa"
-            onValueChange={(value) => setCategoriaDespesa(value)}
-          >
-            {categorias.map((categoria) => (
-              <Select.Item key={categoria.nome} value={categoria.nome} label={categoria.nome} />
-            ))}
-          </Select>
-          <Input
-            variant="outline"
-            value={novaCategoria}
-            onChangeText={setNovaCategoria}
-            placeholder="Nova categoria"
-          />
-          <Button onPress={handleNovaCategoria}>Adicionar Categoria</Button>
-        </FormControl>
+          <FormControl>
+            <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+              Categoria:
+            </FormControl.Label>
+            <Select
+              placeholder="Selecione uma categoria"
+              selectedValue={categoriaDespesa}
+              minWidth={200}
+              accessibilityLabel="Selecione a categoria da Despesa"
+              onValueChange={(value) => setCategoriaDespesa(value)}
+            >
+              {categorias.map((categoria) => (
+                <Select.Item
+                  key={categoria.nome}
+                  value={categoria.nome}
+                  label={categoria.nome}
+                />
+              ))}
+            </Select>
+            {!mostrarNovaCategoria && (
+              <Button onPress={() => setMostrarNovaCategoria(true)} style={styles.addButton}>
+                <Text style={styles.addButtonText}>Adicionar Nova Categoria</Text>
+              </Button>
+            )}
+            {mostrarNovaCategoria && (
+              <Input
+                variant="outline"
+                value={novaCategoria}
+                onChangeText={setNovaCategoria}
+                placeholder="Nova categoria"
+                style={styles.input}
+              />
+            )}
+            {mostrarNovaCategoria && (
+              <Button onPress={handleNovaCategoria} style={styles.addButton}>
+                <Text style={styles.addButtonText}>Adicionar Categoria</Text>
+              </Button>
+            )}
+          </FormControl>
 
-        <FormControl>
-          <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
-            Data:
-          </FormControl.Label>
-          <Input
-            variant="outline"
-            value={formatarData(dataDespesa)}
-            onChangeText={setDataDespesa}
-            placeholder="DD/MM/YYYY"
-            keyboardType="numeric"
-            paddingLeft={2}
-            paddingRight={2}
-            onFocus={handleDateFocus}
-            onBlur={handleDateBlur}
-          />
-        </FormControl>
+          <FormControl>
+            <FormControl.Label _text={{ fontSize: 'md', fontWeight: 'bold' }}>
+              Data:
+            </FormControl.Label>
+            <Input
+              variant="outline"
+              value={formatarData(dataDespesa)}
+              onChangeText={setDataDespesa}
+              placeholder="DD/MM/YYYY"
+              keyboardType="numeric"
+              paddingLeft={2}
+              paddingRight={2}
+              onFocus={handleDateFocus}
+              onBlur={handleDateBlur}
+              style={styles.input}
+            />
+          </FormControl>
 
-        <Button style={styles.addButton} onPress={handleAddExpense}>
-          <Text style={styles.addButtonText}>Adicionar Despesa</Text>
-        </Button>
+          <Button onPress={handleAddExpense} style={styles.addButton}>
+            <Text style={styles.addButtonText}>Adicionar Despesa</Text>
+          </Button>
+        </View>
       </View>
     </NativeBaseProvider>
   );
@@ -178,27 +203,43 @@ const CadastroDespesaScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingHorizontal: 16,
-    backgroundColor: '#EAF0F7',
+    backgroundColor: '#e8e9eb',
   },
-  teste: {
-    fontSize: 20,
+  header: {
+    backgroundColor: '#FA8072',
+    paddingVertical: 16,
+    paddingHorizontal: 16,
     marginBottom: 20,
+  },
+  headerText: {
+    fontSize: 20,
     fontWeight: 'bold',
+    color: '#FFFFFF',
+    textAlign: 'center',
+  },
+  form: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
+    marginHorizontal: 16,
+    marginBottom: 20,
+  },
+  input: {
+    marginBottom: 8,
+    fontSize: 14,
   },
   addButton: {
-    backgroundColor: '#79d6f7',
+    backgroundColor: '#FA8072',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
     marginTop: 20,
   },
   addButtonText: {
-    color: '#1348cf',
-    fontWeight: 'bold',
+    color: '#FFFFFF',
     fontSize: 16,
+    fontWeight: 'bold',
   },
 });
 

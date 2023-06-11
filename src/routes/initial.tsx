@@ -15,7 +15,7 @@ const InitialRoutes: React.FC = () =>{
         <Navigator>
             <Screen name="Inicial" component={InitialScreen} options={{ headerShown: false }}/>
             <Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-            <Screen name="Cadastro" component={CadastroScreen} options={{ headerShown: false }} />
+            <Screen name="CadastroUser" component={CadastroScreen} options={{ headerShown: false }} />
         </Navigator>
     );
 };
