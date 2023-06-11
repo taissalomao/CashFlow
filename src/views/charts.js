@@ -15,8 +15,8 @@ export default function ChartScreen() {
 
   const handleDataPointClick = (data, index, isExpense) => {
     console.log(index);
-    console.log(data.dataset.data[index]);
-    const value = data.dataset.data[index];
+    console.log(data[index]);
+    const value = data[index];
     const dataType = isExpense ? "Despesa" : "Receita";
     Alert.alert("Valor", `${dataType}: ${value}`);
   };
@@ -60,13 +60,20 @@ export default function ChartScreen() {
     fetchIncomes();
   }, [user, user?.uid]);
 
+  const formatDate = (dateString) => {
+    const day = dateString.substr(0, 2);
+    const month = dateString.substr(2, 2);
+    const year = dateString.substr(4, 4);
+    return `${day}/${month}/${year}`;
+  };
+
   const calculateProfitData = () => {
     if (incomeData && expenseData) {
       const profitData = incomeData.map((income, index) => {
         const expense = expenseData[index];
         const profit = income.valor - expense.valor;
         return {
-          label: income.label,
+          label: formatDate(income.data? income.data : ""),
           valor: profit,
         };
       });
@@ -84,37 +91,34 @@ export default function ChartScreen() {
           paddingTop: 5,
         }}
       >
-        <ScrollView
-          horizontal
-          showsHorizontalScrollIndicator={false}
-        >
-          <View style={{ flexDirection: 'column' }}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+          <View style={{ flexDirection: "column" }}>
             <Text>Receitas</Text>
             {incomeData && (
               <LineChart
                 data={{
-                  labels: incomeData.map((income) => income.label),
+                  labels: incomeData.map((income) => formatDate(income.data)),
                   datasets: [
                     {
                       data: incomeData.map((income) => income.valor),
                     },
                   ],
                 }}
-                width={Dimensions.get("window").width * 2} // Multiplica por 2 para que o gráfico seja mais largo que a tela
+                width={Dimensions.get("window").width * 2}
                 height={300}
                 yAxisLabel="$"
                 yAxisSuffix="k"
-                yAxisInterval={1} // optional, defaults to 1
+                yAxisInterval={1}
                 chartConfig={{
-                  backgroundColor: "#F6F6F6", // Nova cor de fundo do gráfico
-                  backgroundGradientFrom: "#F6F6F6", // Nova cor de gradiente de fundo do gráfico
-                  backgroundGradientTo: "#F6F6F6", // Nova cor de gradiente de fundo do gráfico
+                  backgroundColor: "#F6F6F6",
+                  backgroundGradientFrom: "#F6F6F6",
+                  backgroundGradientTo: "#F6F6F6",
                   decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`, // Azul
+                  color: (opacity = 1) => `rgba(0, 122, 255, ${opacity})`,
                   propsForDots: {
                     r: "6",
                     strokeWidth: "2",
-                    stroke: "#007AFF", // Azul brilhante
+                    stroke: "#007AFF",
                   },
                 }}
                 bezier
@@ -123,7 +127,7 @@ export default function ChartScreen() {
                   borderRadius: 16,
                 }}
                 onDataPointClick={({ index }) =>
-                  handleDataPointClick(incomeData, index, false)
+                  handleDataPointClick(incomeData.map((income) => income.valor), index, false)
                 }
               />
             )}
@@ -131,28 +135,28 @@ export default function ChartScreen() {
             {expenseData && (
               <LineChart
                 data={{
-                  labels: expenseData.map((expense) => expense.label),
+                  labels: expenseData.map((expense) => formatDate(expense.data)),
                   datasets: [
                     {
                       data: expenseData.map((expense) => expense.valor),
                     },
                   ],
                 }}
-                width={Dimensions.get("window").width * 2} // Multiplica por 2 para que o gráfico seja mais largo que a tela
+                width={Dimensions.get("window").width * 2}
                 height={300}
                 yAxisLabel="$"
                 yAxisSuffix="k"
-                yAxisInterval={1} // optional, defaults to 1
+                yAxisInterval={1}
                 chartConfig={{
-                  backgroundColor: "#F6F6F6", // Nova cor de fundo do gráfico
-                  backgroundGradientFrom: "#F6F6F6", // Nova cor de gradiente de fundo do gráfico
-                  backgroundGradientTo: "#F6F6F6", // Nova cor de gradiente de fundo do gráfico
+                  backgroundColor: "#F6F6F6",
+                  backgroundGradientFrom: "#F6F6F6",
+                  backgroundGradientTo: "#F6F6F6",
                   decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(255, 59, 48, ${opacity})`, // Vermelho
+                  color: (opacity = 1) => `rgba(255, 59, 48, ${opacity})`,
                   propsForDots: {
                     r: "6",
                     strokeWidth: "2",
-                    stroke: "#FF3B30", // Vermelho brilhante
+                    stroke: "#FF3B30",
                   },
                 }}
                 bezier
@@ -161,7 +165,7 @@ export default function ChartScreen() {
                   borderRadius: 16,
                 }}
                 onDataPointClick={({ index }) =>
-                  handleDataPointClick(expenseData, index, true)
+                  handleDataPointClick(expenseData.map((expense) => expense.valor), index, true)
                 }
               />
             )}
@@ -169,28 +173,28 @@ export default function ChartScreen() {
             {incomeData && expenseData && (
               <LineChart
                 data={{
-                  labels: incomeData.map((income) => income.label),
+                  labels: incomeData.map((income) => formatDate(income.data)),
                   datasets: [
                     {
                       data: calculateProfitData().map((profit) => profit.valor),
                     },
                   ],
                 }}
-                width={Dimensions.get("window").width * 2} // Multiplica por 2 para que o gráfico seja mais largo que a tela
+                width={Dimensions.get("window").width * 2}
                 height={300}
                 yAxisLabel="$"
                 yAxisSuffix="k"
-                yAxisInterval={1} // optional, defaults to 1
+                yAxisInterval={1}
                 chartConfig={{
-                  backgroundColor: "#F6F6F6", // Nova cor de fundo do gráfico
-                  backgroundGradientFrom: "#F6F6F6", // Nova cor de gradiente de fundo do gráfico
-                  backgroundGradientTo: "#F6F6F6", // Nova cor de gradiente de fundo do gráfico
+                  backgroundColor: "#F6F6F6",
+                  backgroundGradientFrom: "#F6F6F6",
+                  backgroundGradientTo: "#F6F6F6",
                   decimalPlaces: 2,
-                  color: (opacity = 1) => `rgba(40, 167, 69, ${opacity})`, // Verde
+                  color: (opacity = 1) => `rgba(40, 167, 69, ${opacity})`,
                   propsForDots: {
                     r: "6",
                     strokeWidth: "2",
-                    stroke: "#28A745", // Verde brilhante
+                    stroke: "#28A745",
                   },
                 }}
                 bezier
@@ -199,7 +203,7 @@ export default function ChartScreen() {
                   borderRadius: 16,
                 }}
                 onDataPointClick={({ index }) =>
-                  handleDataPointClick(calculateProfitData(), index, false)
+                  handleDataPointClick(calculateProfitData().map((profit) => profit.valor), index, false)
                 }
               />
             )}

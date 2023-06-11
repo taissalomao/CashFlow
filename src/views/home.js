@@ -20,15 +20,17 @@ export default function HomeScreen() {
         if (!user) {
           return;
         }
-
         const userDocRef = doc(db, 'user', user.uid);
-        const userDocSnapshot = await userDocRef.get();
-        if (userDocSnapshot.exists()) {
-          const userData = userDocSnapshot.data();
+        const infoRef = collection(userDocRef, 'info');
+        const q = query(infoRef);
+        const userDocSnapshot = await getDocs(q);
+        userDocSnapshot.forEach((doc) => {
+          const userData = doc.data()
           if (userData && userData.nome) {
-            setUserName(userData.nome);
+            setUserName(userData.nome)
           }
-        }
+        })
+
       } catch (error) {
         console.log(error);
       }

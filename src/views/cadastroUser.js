@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider, FormControl, Box } from 'native-base';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
-import { collection, doc } from 'firebase/firestore';
+import { addDoc, collection, doc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { set } from 'firebase/database';
@@ -22,23 +22,25 @@ function CadastroScreen() {
     try {
       setSenhaError('');
       setConfirmSenhaError('');
-
+      console.log(user)
       if (user.senha !== confirmSenha) {
         setConfirmSenhaError('As senhas não correspondem');
         return;
       }
-
-      if (user.senha.length < 6) {
-        setSenhaError('A senha deve ter no mínimo 6 caracteres');
-        return;
+      if (user && user.senha) {
+        if (user.senha.length < 6) {
+          setSenhaError('A senha deve ter no mínimo 6 caracteres');
+          return;
+        }
       }
+      
 
       await createUserWithEmailAndPassword(auth, user.email, user.senha).then(
         async (result) => {
           const { uid } = result.user;
-          const usersRef = collection(db, 'users');
-          const newUserDocRef = doc(usersRef, uid);
-          await set(newUserDocRef, user);
+          console.log("aqui")
+          const userRef = collection(db, 'user', uid, 'info');
+          await addDoc(userRef, user)
           navigation.navigate('Home');
         }
       );
