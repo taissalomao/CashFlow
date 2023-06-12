@@ -8,118 +8,118 @@ import { useAuthentication } from '../utils/authenticator';
 import { doc } from 'firebase/firestore';
 import { NativeBaseProvider, Button } from 'native-base';
 
-const ListagemDespesaScreen = () => {
-  const [expenses, setExpenses] = useState([]);
-  const [totalDespesas, setTotalDespesas] = useState(0);
-  const [selectedExpense, setSelectedExpense] = useState(null);
+const ListagemReceitaScreen = () => {
+  const [revenues, setRevenues] = useState([]);
+  const [totalReceitas, setTotalReceitas] = useState(0);
+  const [selectedRevenue, setSelectedRevenue] = useState(null);
   const navigation = useNavigation();
   const { user } = useAuthentication();
 
   useEffect(() => {
-    const fetchExpenses = async () => {
+    const fetchRevenues = async () => {
       try {
         const userDocRef = doc(db, 'user', user?.uid);
-        const expensesRef = collection(userDocRef, 'despesas');
-        const q = query(expensesRef);
+        const revenuesRef = collection(userDocRef, 'receitas');
+        const q = query(revenuesRef);
         const querySnapshot = await getDocs(q);
-        const expenseList = [];
+        const revenueList = [];
         let total = 0;
         querySnapshot.forEach((doc) => {
-          const expense = { id: doc.id, ...doc.data() };
-          expenseList.push(expense);
-          total += expense.valor;
+          const revenue = { id: doc.id, ...doc.data() };
+          revenueList.push(revenue);
+          total += revenue.valor;
         });
-        setExpenses(expenseList);
-        setTotalDespesas(total);
+        setRevenues(revenueList);
+        setTotalReceitas(total);
       } catch (error) {
         console.log(error);
       }
     };
 
-    fetchExpenses();
+    fetchRevenues();
   }, [user, user?.uid]);
 
-  const handleEditExpense = (expenseId) => {
-    const expenseToEdit = expenses.find((expense) => expense.id === expenseId);
-    if (expenseToEdit) {
-      navigation.navigate('EditarDespesa', { despesa: expenseToEdit });
+  const handleEditRevenue = (revenueId) => {
+    const revenueToEdit = revenues.find((revenue) => revenue.id === revenueId);
+    if (revenueToEdit) {
+      navigation.navigate('EditarReceita', { Receita: revenueToEdit });
     }
   };
 
-  const handleDeleteExpense = async (expenseId) => {
-    if (selectedExpense) {
+  const handleDeleteRevenue = async (revenueId) => {
+    if (selectedRevenue) {
       try {
-        await deleteDoc(doc(db, 'user', user?.uid, 'despesas', expenseId));
-        const updatedExpenses = expenses.filter((expense) => expense.id !== expenseId);
-        setExpenses(updatedExpenses);
-        setSelectedExpense(null);
+        await deleteDoc(doc(db, 'user', user?.uid, 'receitas', revenueId));
+        const updatedRevenues = revenues.filter((revenue) => revenue.id !== revenueId);
+        setRevenues(updatedRevenues);
+        setSelectedRevenue(null);
       } catch (error) {
         console.log(error);
       }
     }
   };
 
-  const renderExpenseItem = ({ item }) => (
+  const renderRevenueItem = ({ item }) => (
     <TouchableOpacity
-      style={styles.expenseItem}
-      onPress={() => setSelectedExpense(item)}
+      style={styles.revenueItem}
+      onPress={() => setSelectedRevenue(item)}
     >
-      <Text style={styles.expenseTitle}>{item.nome}</Text>
-      <Text style={styles.expenseAmount}>R$ {item.valor.toFixed(2)}</Text>
+      <Text style={styles.revenueTitle}>{item.nome}</Text>
+      <Text style={styles.revenueAmount}>R$ {item.valor.toFixed(2)}</Text>
     </TouchableOpacity>
   );
 
   return (
     <NativeBaseProvider>
       <View style={styles.container}>
-        <View style={styles.totalDespesasContainer}>
-          <Text style={styles.totalDespesas}>Total de Despesas: R$ {totalDespesas.toFixed(2)}</Text>
+        <View style={styles.totalReceitasContainer}>
+          <Text style={styles.totalReceitas}>Total de Receitas: R$ {totalReceitas.toFixed(2)}</Text>
         </View>
         <View style={styles.separator} />
-        <View style={styles.expenseListContainer}>
+        <View style={styles.revenueListContainer}>
           <FlatList
-            data={expenses}
+            data={revenues}
             keyExtractor={(item) => item.id}
-            renderItem={renderExpenseItem}
-            ListEmptyComponent={<Text style={styles.emptyListText}>Nenhuma despesa encontrada</Text>}
+            renderItem={renderRevenueItem}
+            ListEmptyComponent={<Text style={styles.emptyListText}>Nenhuma Receita encontrada</Text>}
           />
           <View style={styles.topSection}>
             <View style={styles.addButtonContainer}>
               <Button
                 style={styles.addButton}
                 onPress={() => {
-                  navigation.navigate('CadastroDespesa');
+                  navigation.navigate('CadastroReceita');
                 }}
               >
-                <Text style={styles.addButtonText}>Adicionar despesa</Text>
+                <Text style={styles.addButtonText}>Adicionar Receita</Text>
               </Button>
             </View>
           </View>
         </View>
       </View>
-      {selectedExpense && (
+      {selectedRevenue && (
         <View style={styles.dialogContainer}>
-          <Text style={styles.expenseName}>{selectedExpense.nome}</Text>
-          <Text style={styles.expenseValue}>Valor: R${selectedExpense.valor.toFixed(2)}</Text>
-          <Text style={styles.expenseDescription}>Categoria: {selectedExpense.categoria}</Text>
-          <Text style={styles.expenseDate}>Data: {selectedExpense.data}</Text>
+          <Text style={styles.revenueName}>{selectedRevenue.nome}</Text>
+          <Text style={styles.revenueValue}>Valor: R${selectedRevenue.valor.toFixed(2)}</Text>
+          <Text style={styles.revenueDescription}>Categoria: {selectedRevenue.categoria}</Text>
+          <Text style={styles.revenueDate}>Data: {selectedRevenue.data}</Text>
           <Button
             style={[styles.button, styles.deleteButton]}
-            onPress={() => handleDeleteExpense(selectedExpense.id)}
+            onPress={() => handleDeleteRevenue(selectedRevenue.id)}
             colorScheme="red"
           >
             Excluir
           </Button>
           <Button
             style={[styles.button, styles.editButton]}
-            onPress={() => handleEditExpense(selectedExpense.id)}
+            onPress={() => handleEditRevenue(selectedRevenue.id)}
             colorScheme="blue"
           >
             Editar
           </Button>
           <Button
             style={[styles.button, styles.closeButton]}
-            onPress={() => setSelectedExpense(null)}
+            onPress={() => setSelectedRevenue(null)}
             colorScheme="gray"
           >
             Fechar
@@ -136,14 +136,14 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8e9eb',
     paddingBottom: 16,
   },
-  totalDespesasContainer: {
-    backgroundColor: '#FA8072',
+  totalReceitasContainer: {
+    backgroundColor: '#66CDAA',
     padding: 16,
     marginBottom: 16,
     width: '100%',
     height: 80,
   },
-  totalDespesas: {
+  totalReceitas: {
     fontSize: 18,
     fontWeight: 'bold',
     color: 'black',
@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   separator: {
     height: 8,
   },
-  expenseListContainer: {
+  revenueListContainer: {
     flex: 1,
     flexGrow: 1,
   },
@@ -175,13 +175,13 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
-    backgroundColor: '#FA8072',
+    backgroundColor: '#66CDAA',
   },
   addButtonText: {
     fontSize: 16,
     color: 'black',
   },
-  expenseItem: {
+  revenueItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
@@ -190,12 +190,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
   },
-  expenseTitle: {
+  revenueTitle: {
     fontSize: 12,
     fontWeight: 'bold',
     color: 'black',
   },
-  expenseAmount: {
+  revenueAmount: {
     fontSize: 14,
     color: 'black',
   },
@@ -204,24 +204,24 @@ const styles = StyleSheet.create({
     backgroundColor: 'white',
     borderRadius: 8,
   },
-  expenseName: {
+  revenueName: {
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
     color: 'black',
   },
-  expenseValue: {
+  revenueValue: {
     fontSize: 14,
     fontWeight: 'bold',
     marginBottom: 16,
     color: 'black',
   },
-  expenseDescription: {
+  revenueDescription: {
     fontSize: 14,
     marginBottom: 16,
     color: 'black',
   },
-  expenseDate: {
+  revenueDate: {
     fontSize: 14,
     marginBottom: 24,
     color: 'black',
@@ -243,4 +243,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ListagemDespesaScreen;
+export default ListagemReceitaScreen;

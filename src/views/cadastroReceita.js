@@ -1,39 +1,39 @@
-/* eslint-disable no-unused-vars *//* eslint-disable prettier/prettier */
+/* eslint-disable prettier/prettier */
+/* eslint-disable no-unused-vars */
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
-import { Button, Input, Text, NativeBaseProvider, FormControl, Box, Select } from 'native-base';
+import { Button, Input, Text, NativeBaseProvider, FormControl, Select } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
 import { collection, addDoc, getDocs, doc, query } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 
-const CadastroDespesaScreen = () => {
+const CadastroReceitaScreen = () => {
   const navigation = useNavigation();
   const { user } = useAuthentication();
-  const [nomeDespesa, setNomeDespesa] = useState('');
-  const [valorDespesa, setValorDespesa] = useState('');
-  const [descricaoDespesa, setDescricaoDespesa] = useState('');
+  const [nomeReceita, setNomeReceita] = useState('');
+  const [valorReceita, setValorReceita] = useState('');
+  const [descricaoReceita, setDescricaoReceita] = useState('');
   const [categorias, setCategorias] = useState([]);
-  const [categoriaDespesa, setCategoriaDespesa] = useState('');
-  const [novaCategoria, setNovaCategoria] = useState('');
-  const [dataDespesa, setDataDespesa] = useState('');
-  const [isDateFocused, setIsDateFocused] = useState(false);
+  const [categoriaReceita, setCategoriaReceita] = useState('');
   const [mostrarNovaCategoria, setMostrarNovaCategoria] = useState(false);
+  const [novaCategoria, setNovaCategoria] = useState('');
+  const [dataReceita, setDataReceita] = useState('');
+  const [isDateFocused, setIsDateFocused] = useState(false);
 
   useEffect(() => {
-    carregarCategorias();
+    carregarCategoriasReceitas();
   }, []);
 
-  const carregarCategorias = async () => {
+  const carregarCategoriasReceitas = async () => {
     try {
       const userDocRef = doc(db, 'user', user.uid);
-      const categoriasRef = collection(userDocRef, 'categorias');
+      const categoriasRef = collection(userDocRef, 'categoriasReceitas');
       const q = query(categoriasRef);
       const categoriasSnapshot = await getDocs(q);
       const categoriasData = [];
       categoriasSnapshot.forEach((doc) => categoriasData.push(doc.data()));
       setCategorias(categoriasData);
-
     } catch (error) {
       console.log(error);
     }
@@ -56,19 +56,19 @@ const CadastroDespesaScreen = () => {
     return formattedData;
   };
 
-  const handleAddExpense = async () => {
+  const handleAddRevenue = async () => {
     try {
-      const expensesRef = collection(db, 'user', user?.uid, 'despesas');
-      const dataNumerica = dataDespesa.replace(/[^\d]/g, '');
-      await addDoc(expensesRef, {
-        nome: nomeDespesa,
-        valor: parseFloat(valorDespesa),
-        descricao: descricaoDespesa,
-        categoria: categoriaDespesa,
+      const revenueRef = collection(db, 'user', user?.uid, 'receitas');
+      const dataNumerica = dataReceita.replace(/[^\d]/g, '');
+      await addDoc(revenueRef, {
+        nome: nomeReceita,
+        valor: parseFloat(valorReceita),
+        descricao: descricaoReceita,
+        categoria: categoriaReceita,
         data: dataNumerica,
       });
-
-      navigation.navigate('Despesas');
+  
+      navigation.navigate('Receitas');
     } catch (error) {
       console.log(error);
     }
@@ -82,12 +82,12 @@ const CadastroDespesaScreen = () => {
     setIsDateFocused(false);
   };
 
-  const handleNovaCategoria = async () => {
+  const handleNovaCategoriaReceita = async () => {
     try {
-      const categoriasRef = collection(db, 'user', user.uid, 'categorias');
+      const categoriasRef = collection(db, 'user', user.uid, 'categoriasReceitas');
       await addDoc(categoriasRef, { nome: novaCategoria });
       setNovaCategoria('');
-      carregarCategorias();
+      carregarCategoriasReceitas()
     } catch (error) {
       console.log(error);
     }
@@ -97,7 +97,7 @@ const CadastroDespesaScreen = () => {
     <NativeBaseProvider>
       <View style={styles.container}>
         <View style={styles.header}>
-          <Text style={styles.headerText}>Cadastre a Despesa</Text>
+          <Text style={styles.headerText}>Cadastre a Receita</Text>
         </View>
 
         <View style={styles.form}>
@@ -107,8 +107,8 @@ const CadastroDespesaScreen = () => {
             </FormControl.Label>
             <Input
               variant="outline"
-              value={nomeDespesa}
-              onChangeText={setNomeDespesa}
+              value={nomeReceita}
+              onChangeText={setNomeReceita}
               style={styles.input}
             />
           </FormControl>
@@ -119,8 +119,8 @@ const CadastroDespesaScreen = () => {
             </FormControl.Label>
             <Input
               variant="outline"
-              value={descricaoDespesa}
-              onChangeText={setDescricaoDespesa}
+              value={descricaoReceita}
+              onChangeText={setDescricaoReceita}
               style={styles.input}
             />
           </FormControl> */}
@@ -131,8 +131,8 @@ const CadastroDespesaScreen = () => {
             </FormControl.Label>
             <Input
               variant="outline"
-              value={valorDespesa}
-              onChangeText={setValorDespesa}
+              value={valorReceita}
+              onChangeText={setValorReceita}
               keyboardType="numeric"
               style={styles.input}
             />
@@ -144,10 +144,10 @@ const CadastroDespesaScreen = () => {
             </FormControl.Label>
             <Select
               placeholder="Selecione uma categoria"
-              selectedValue={categoriaDespesa}
+              selectedValue={categoriaReceita}
               minWidth={200}
-              accessibilityLabel="Selecione a categoria da Despesa"
-              onValueChange={(value) => setCategoriaDespesa(value)}
+              accessibilityLabel="Selecione a categoria da Receita"
+              onValueChange={(value) => setCategoriaReceita(value)}
             >
               {categorias.map((categoria) => (
                 <Select.Item
@@ -172,7 +172,7 @@ const CadastroDespesaScreen = () => {
               />
             )}
             {mostrarNovaCategoria && (
-              <Button onPress={handleNovaCategoria} style={styles.addButton}>
+              <Button onPress={handleNovaCategoriaReceita} style={styles.addButton}>
                 <Text style={styles.addButtonText}>Adicionar Categoria</Text>
               </Button>
             )}
@@ -184,8 +184,8 @@ const CadastroDespesaScreen = () => {
             </FormControl.Label>
             <Input
               variant="outline"
-              value={formatarData(dataDespesa)}
-              onChangeText={setDataDespesa}
+              value={formatarData(dataReceita)}
+              onChangeText={setDataReceita}
               placeholder="DD/MM/YYYY"
               keyboardType="numeric"
               paddingLeft={2}
@@ -196,8 +196,8 @@ const CadastroDespesaScreen = () => {
             />
           </FormControl>
 
-          <Button onPress={handleAddExpense} style={styles.addButton}>
-            <Text style={styles.addButtonText}>Adicionar Despesa</Text>
+          <Button onPress={handleAddRevenue} style={styles.addButton}>
+            <Text style={styles.addButtonText}>Adicionar Receita</Text>
           </Button>
         </View>
       </View>
@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#e8e9eb',
   },
   header: {
-    backgroundColor: '#FA8072',
+    backgroundColor: '#66CDAA',
     paddingVertical: 16,
     paddingHorizontal: 16,
     marginBottom: 20,
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   addButton: {
-    backgroundColor: '#FA8072',
+    backgroundColor: '#66CDAA',
     paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 16,
@@ -248,4 +248,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CadastroDespesaScreen;
+export default CadastroReceitaScreen;

@@ -1,22 +1,19 @@
-/* eslint-disable prettier/prettier */
-import React from "react"
+/* eslint-disable quotes *//* eslint-disable prettier/prettier */
+import React from "react";
 
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+/* import { createNativeStackNavigator } from "@react-navigation/native-stack"; */
 
-const { Navigator, Screen} = createNativeStackNavigator();
+/* const {Screen} = createNativeStackNavigator(); */
 
-import CadastroScreen from "../views/cadastroUser";
-import LoginScreen from "../views/login";
-import CadastroDespesaScreen from "../views/cadastroDespesa";
+
+import { useAuthentication } from "../utils/authenticator";
+import { AuthRoutes } from "./auth";
+import { InitialRoutes } from "./initial";
 
 const Routes: React.FC = () =>{
-    return(
-        <Navigator initialRouteName="Login">
-            <Screen name="Login" component={LoginScreen} />
-            <Screen name="Cadastro" component={CadastroScreen} />
-            <Screen name="CadastroDespesa" component={CadastroDespesaScreen}/>
-        </Navigator>
-    )
-}
+    const { user } = useAuthentication();
 
-export {Routes}
+    return user ? <AuthRoutes /> : <InitialRoutes />;
+};
+
+export {Routes};
