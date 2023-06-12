@@ -5,9 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { collection, query, getDocs, doc, where } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
-import { Button } from 'native-base';
 import MonthPicker from 'react-native-month-year-picker';
-
+import { Button, Avatar } from 'native-base';
 
 export default function HomeScreen() {
   const [totalDespesas, setTotalDespesas] = useState(0);
@@ -125,7 +124,7 @@ export default function HomeScreen() {
     }
     setDatePickerVisible(false);
   };
-  
+
 
 
   return (
@@ -137,7 +136,11 @@ export default function HomeScreen() {
       <View style={styles.container}>
         <View style={styles.topSection}>
           <Text style={styles.welcome}>Bem-vindo, {userName}!</Text>
-          <Button style={styles.avatarButton} onPress={navigateToProfile} />
+          <Button style={styles.avatarButton} onPress={navigateToProfile}>
+            <Avatar size="sm" bg="blue.500" color="white">
+              {userName.charAt(0).toUpperCase()}
+            </Avatar>
+          </Button>
         </View>
         <TouchableOpacity style={styles.button} onPress={showDatePicker}>
           <Text style={styles.buttonText}>Selecionar Mês</Text>
@@ -211,13 +214,13 @@ export default function HomeScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#e8e9eb',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 10, // Altere para o valor desejado
   },
   negativeProfit: {
     color: 'red',
@@ -236,6 +239,9 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: 30,
     paddingBottom: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   welcome: {
     color: '#fff',
@@ -273,9 +279,9 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: '#79d6f7',
+    width: '90%',
     borderRadius: 16,
     height: 52,
-    paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,
