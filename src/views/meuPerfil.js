@@ -6,13 +6,14 @@ import { doc, collection, query, getDocs, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import Alert from 'react-native-alert';
 
 function PerfilScreen() {
   const navigation = useNavigation();
-  const [user, setUser] = useState(null);
+  const [users, setUser] = useState(null);
   const [editableUser, setEditableUser] = useState({});
   const [isEditing, setIsEditing] = useState(false);
-
+  const { user } = useAuthentication();
   const auth = getAuth();
 
   useEffect(() => {
@@ -48,16 +49,16 @@ function PerfilScreen() {
   async function handleSave() {
     try {
       if (!editableUser.nome || !editableUser.email) {
-        console.log('Por favor, preencha todos os campos obrigatórios.');
+        Alert('Por favor, preencha todos os campos obrigatórios.');
         return;
       }
 
       if (editableUser.senha !== editableUser.confirmarSenha) {
-        console.log('A senha e a confirmação da senha não coincidem.');
+        Alert('A senha e a confirmação da senha não coincidem.');
         return;
       }
 
-      const userDocRef = doc(db, 'user', auth.currentUser.uid);
+      const userDocRef = doc(db, 'user', user.uid);
       const infoRef = collection(userDocRef, 'info');
 
       const userDocSnapshot = await getDocs(infoRef);

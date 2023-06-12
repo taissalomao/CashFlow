@@ -59,12 +59,13 @@ const CadastroDespesaScreen = () => {
   const handleAddExpense = async () => {
     try {
       const expensesRef = collection(db, 'user', user?.uid, 'despesas');
+      const dataNumerica = dataDespesa.replace(/[^\d]/g, '');
       await addDoc(expensesRef, {
         nome: nomeDespesa,
         valor: parseFloat(valorDespesa),
         descricao: descricaoDespesa,
         categoria: categoriaDespesa,
-        data: dataDespesa,
+        data: dataNumerica,
       });
 
       navigation.navigate('Despesas');

@@ -59,14 +59,15 @@ const CadastroReceitaScreen = () => {
   const handleAddRevenue = async () => {
     try {
       const revenueRef = collection(db, 'user', user?.uid, 'receitas');
+      const dataNumerica = dataReceita.replace(/[^\d]/g, '');
       await addDoc(revenueRef, {
         nome: nomeReceita,
         valor: parseFloat(valorReceita),
         descricao: descricaoReceita,
         categoria: categoriaReceita,
-        data: dataReceita,
+        data: dataNumerica,
       });
-
+  
       navigation.navigate('Receitas');
     } catch (error) {
       console.log(error);
