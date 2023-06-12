@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider, FormControl, Box, Select } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, query } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 
@@ -26,10 +26,14 @@ const CadastroDespesaScreen = () => {
 
   const carregarCategorias = async () => {
     try {
-      const categoriasRef = collection(db, 'categorias'); // Altere 'categorias' para o nome da sua coleção no banco de dados
-      const categoriasSnapshot = await getDocs(categoriasRef);
-      const categoriasData = categoriasSnapshot.docs.map((doc) => doc.data());
+      const userDocRef = doc(db, 'user', user.uid);
+      const categoriasRef = collection(userDocRef, 'categorias');
+      const q = query(categoriasRef);
+      const categoriasSnapshot = await getDocs(q);
+      const categoriasData = [];
+      categoriasSnapshot.forEach((doc) => categoriasData.push(doc.data()));
       setCategorias(categoriasData);
+
     } catch (error) {
       console.log(error);
     }
@@ -79,7 +83,7 @@ const CadastroDespesaScreen = () => {
 
   const handleNovaCategoria = async () => {
     try {
-      const categoriasRef = collection(db, 'categorias'); // Altere 'categorias' para o nome da sua coleção no banco de dados
+      const categoriasRef = collection(db, 'user', user.uid, 'categorias');
       await addDoc(categoriasRef, { nome: novaCategoria });
       setNovaCategoria('');
       carregarCategorias();

@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
-import { collection, query, getDocs, doc } from 'firebase/firestore';
+import { collection, query, getDocs, doc, where } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 import { Button } from 'native-base';
@@ -45,10 +45,14 @@ export default function HomeScreen() {
         if (!user) {
           return;
         }
-
+  
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+  
         const userDocRef = doc(db, 'user', user.uid);
         const expensesRef = collection(userDocRef, 'despesas');
-        const q = query(expensesRef);
+        const q = query(expensesRef, where('data', '>=', `01${currentMonth}${currentYear}`), where('data', '<=', `${currentMonth}31${currentYear}`));
         const querySnapshot = await getDocs(q);
         let total = 0;
         querySnapshot.forEach((doc) => {
@@ -60,20 +64,24 @@ export default function HomeScreen() {
         console.log(error);
       }
     };
-
+  
     fetchTotalDespesas();
   }, [user]);
-
+  
   useEffect(() => {
     const fetchTotalReceitas = async () => {
       try {
         if (!user) {
           return;
         }
-
+  
+        const currentDate = new Date();
+        const currentMonth = currentDate.getMonth() + 1;
+        const currentYear = currentDate.getFullYear();
+  
         const userDocRef = doc(db, 'user', user.uid);
         const revenuesRef = collection(userDocRef, 'receitas');
-        const q = query(revenuesRef);
+        const q = query(revenuesRef, where('data', '>=', `01${currentMonth}${currentYear}`), where('data', '<=', `31${currentMonth}${currentYear}`));
         const querySnapshot = await getDocs(q);
         let total = 0;
         querySnapshot.forEach((doc) => {
@@ -85,7 +93,7 @@ export default function HomeScreen() {
         console.log(error);
       }
     };
-
+  
     fetchTotalReceitas();
   }, [user]);
 

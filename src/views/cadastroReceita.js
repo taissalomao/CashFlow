@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider, FormControl, Select } from 'native-base';
 import { useNavigation } from '@react-navigation/native';
-import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { collection, addDoc, getDocs, doc, query } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
 
@@ -27,9 +27,12 @@ const CadastroReceitaScreen = () => {
 
   const carregarCategoriasReceitas = async () => {
     try {
-      const categoriasRef = collection(db, 'categoriasReceitas');
-      const categoriasSnapshot = await getDocs(categoriasRef);
-      const categoriasData = categoriasSnapshot.docs.map((doc) => doc.data());
+      const userDocRef = doc(db, 'user', user.uid);
+      const categoriasRef = collection(userDocRef, 'categoriasReceitas');
+      const q = query(categoriasRef);
+      const categoriasSnapshot = await getDocs(q);
+      const categoriasData = [];
+      categoriasSnapshot.forEach((doc) => categoriasData.push(doc.data()));
       setCategorias(categoriasData);
     } catch (error) {
       console.log(error);
@@ -80,10 +83,10 @@ const CadastroReceitaScreen = () => {
 
   const handleNovaCategoriaReceita = async () => {
     try {
-      const categoriasRef = collection(db, 'categoriasReceitas');
+      const categoriasRef = collection(db, 'user', user.uid, 'categoriasReceitas');
       await addDoc(categoriasRef, { nome: novaCategoria });
       setNovaCategoria('');
-      carregarCategoriasReceitas();
+      carregarCategoriasReceitas()
     } catch (error) {
       console.log(error);
     }
