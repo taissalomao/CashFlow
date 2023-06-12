@@ -1,51 +1,76 @@
 /* eslint-disable prettier/prettier */
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, Dimensions } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider } from 'native-base';
-import { doc, setDoc, getDoc } from 'firebase/firestore';
+import { doc, collection, query, getDocs, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'; // Importar createUserWithEmailAndPassword
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 function PerfilScreen() {
   const navigation = useNavigation();
-  const [user, setUser] = useState({ nome: '', email: '', senha: '' });
-  const auth = getAuth(); // Obter a instância de autenticação
+  const [user, setUser] = useState(null);
+  const [editableUser, setEditableUser] = useState({});
+  const [isEditing, setIsEditing] = useState(false);
+
+  const auth = getAuth();
 
   useEffect(() => {
-    async function fetchUserData() {
+    const fetchUserData = async () => {
       try {
-        const currentUser = auth.currentUser;
-        if (currentUser) {
-          const { uid } = currentUser;
-          const usersRef = doc(db, 'user', uid);
-          const userSnapshot = await getDoc(usersRef);
-          if (userSnapshot.exists()) {
-            const userData = userSnapshot.data();
-            setUser(userData);
+        onAuthStateChanged(auth, async (currentUser) => {
+          if (currentUser) {
+            const userDocRef = doc(db, 'user', currentUser.uid);
+            const infoRef = collection(userDocRef, 'info');
+            const q = query(infoRef);
+            const userDocSnapshot = await getDocs(q);
+            userDocSnapshot.forEach((doc) => {
+              const userData = doc.data();
+              if (userData && userData.nome) {
+                setUser(userData);
+                setEditableUser(userData);
+              }
+            });
           }
-        }
+        });
       } catch (error) {
         console.log(error);
       }
-    }
+    };
 
     fetchUserData();
-  }, [auth.currentUser]);
+  }, [auth]);
 
-  async function handleRegister() {
+  const handleInputChange = (field, value) => {
+    setEditableUser({ ...editableUser, [field]: value });
+  };
+
+  async function handleSave() {
     try {
-      const { email, senha } = user;
-      const authUser = await createUserWithEmailAndPassword(auth, email, senha);
+      if (!editableUser.nome || !editableUser.email) {
+        console.log('Por favor, preencha todos os campos obrigatórios.');
+        return;
+      }
 
-      const { uid } = authUser.user;
-      const usersRef = doc(db, 'user', uid);
-      await setDoc(usersRef, user);
-      
-      // Crie um novo objeto com os valores atualizados
-      const updatedUser = { ...user };
-      setUser(updatedUser);
-      
+      if (editableUser.senha !== editableUser.confirmarSenha) {
+        console.log('A senha e a confirmação da senha não coincidem.');
+        return;
+      }
+
+      const userDocRef = doc(db, 'user', auth.currentUser.uid);
+      const infoRef = collection(userDocRef, 'info');
+
+      const userDocSnapshot = await getDocs(infoRef);
+      if (userDocSnapshot.empty) {
+        await setDoc(infoRef, editableUser);
+      } else {
+        const docId = userDocSnapshot.docs[0].id;
+        await setDoc(doc(infoRef, docId), editableUser);
+      }
+
+      setUser(editableUser);
+      setIsEditing(false);
+
       navigation.navigate('Home');
     } catch (error) {
       console.log(error);
@@ -55,41 +80,67 @@ function PerfilScreen() {
   return (
     <NativeBaseProvider>
       <View style={styles.containerPai}>
+        <View style={styles.header}>
+          <Text style={styles.headerText}>Meu perfil</Text>
+        </View>
         <View style={styles.containerFilho}>
           <View style={styles.content}>
             <View style={styles.formulario}>
-              <Text style={styles.teste}>Meu perfil</Text>
               <View style={styles.inputs}>
+                <Text style={styles.label}>Nome</Text>
                 <Input
                   variant="outline"
                   placeholder="Nome"
-                  onChangeText={(e) => setUser({ ...user, nome: e })}
-                  value={user.nome}
+                  onChangeText={(e) => handleInputChange('nome', e)}
+                  value={editableUser.nome || ''}
+                  editable={isEditing}
                 />
               </View>
               <View style={styles.inputs}>
+                <Text style={styles.label}>Email</Text>
                 <Input
                   variant="outline"
                   placeholder="Email"
-                  onChangeText={(e) => setUser({ ...user, email: e })}
-                  value={user.email}
+                  onChangeText={(e) => handleInputChange('email', e)}
+                  value={editableUser.email || ''}
+                  editable={isEditing}
                 />
               </View>
-              <View style={styles.inputs}>
-                <Input
-                  variant="outline"
-                  placeholder="Senha"
-                  onChangeText={(e) => setUser({ ...user, senha: e })}
-                  value={user.senha}
-                />
-              </View>
-              <View style={styles.inputs}>
-                <Input variant="outline" placeholder="Confirme a senha" />
-              </View>
-              <View style={styles.inputs}>
-                <Button style={styles.saveButton} onPress={handleRegister}>
-                  <Text style={styles.textSaveButton}>Salvar</Text>
-                </Button>
+              {isEditing && (
+                <>
+                  <View style={styles.inputs}>
+                    <Text style={styles.label}>Senha</Text>
+                    <Input
+                      variant="outline"
+                      placeholder="Senha"
+                      onChangeText={(e) => handleInputChange('senha', e)}
+                      value={editableUser.senha || ''}
+                      secureTextEntry
+                    />
+                  </View>
+                  <View style={styles.inputs}>
+                    <Text style={styles.label}>Confirmar Senha</Text>
+                    <Input
+                      variant="outline"
+                      placeholder="Confirmar Senha"
+                      onChangeText={(e) => handleInputChange('confirmarSenha', e)}
+                      value={editableUser.confirmarSenha || ''}
+                      secureTextEntry
+                    />
+                  </View>
+                </>
+              )}
+              <View style={styles.buttonContainer}>
+                {!isEditing && (
+                  <Button onPress={() => setIsEditing(true)} style={styles.button}>
+                    Editar
+                  </Button>
+                )}
+                {isEditing && (
+                  <Button onPress={handleSave} style={styles.button}>
+                    Salvar
+                  </Button>
+                )}
               </View>
             </View>
           </View>
@@ -99,46 +150,62 @@ function PerfilScreen() {
   );
 }
 
-export default PerfilScreen;
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   containerPai: {
     flex: 1,
-    backgroundColor: '#EAF0F7',
+    alignItems: 'center',
     justifyContent: 'flex-start',
   },
-  containerFilho: {
-    flex: 0.3,
-    backgroundColor: 'blue',
-    paddingTop: 70,
+  header: {
+    backgroundColor: '#694fad',
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 5,
+    marginBottom: 10,
+    width: '100%',
   },
-  teste: {
+  headerText: {
+    fontWeight: 'bold',
+    fontSize: 18,
+    color: '#FFF',
+    textAlign: 'center',
+  },
+  containerFilho: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    fontSize: 20,
-    marginBottom: 20,
+    width: '100%',
   },
   content: {
-    backgroundColor: '#fff',
-    marginHorizontal: 20,
-    marginVertical: 20,
-    borderRadius: 16,
-    padding: 10,
-    height: 500,
-    justifyContent: 'space-around',
+    width: width * 0.9,
+    backgroundColor: '#FFF',
+    borderRadius: 10,
+    padding: 20,
   },
   formulario: {
-    justifyContent: 'center',
-    alignItems: 'center',
+    marginTop: 20,
+    width: '100%',
   },
   inputs: {
-    width: '80%',
-    marginVertical: 5,
+    marginTop: 10,
   },
-  saveButton: {
-    backgroundColor: '#1E90FF',
+  label: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
-  textSaveButton: {
-    color: 'white',
+  buttonContainer: {
+    marginTop: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  button: {
+    backgroundColor: '#694fad',
+    paddingVertical: 12,
+    paddingHorizontal: 35,
+    borderRadius: 5,
   },
 });
+
+export default PerfilScreen;
