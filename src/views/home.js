@@ -11,9 +11,9 @@ import { Button, Avatar } from 'native-base';
 export default function HomeScreen() {
   const [totalDespesas, setTotalDespesas] = useState(0);
   const [totalReceitas, setTotalReceitas] = useState(0);
-  const [totalLucro, setTotalLucro] = useState(0); // Novo estado para o lucro
-  const [isDatePickerVisible, setDatePickerVisible] = useState(false); // Estado para controlar a visibilidade do datepicker
-  const [selectedDate, setSelectedDate] = useState(new Date()); // Estado para armazenar a data selecionada (mês e ano)
+  const [totalLucro, setTotalLucro] = useState(0);
+  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [userName, setUserName] = useState('');
   const navigation = useNavigation();
   const { user } = useAuthentication();
@@ -49,28 +49,35 @@ export default function HomeScreen() {
         if (!user) {
           return;
         }
-
-        const currentDate = new Date()
+  
+        const currentDate = new Date(selectedDate);
         const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
         const currentYear = currentDate.getFullYear();
-
         const userDocRef = doc(db, 'user', user.uid);
         const expensesRef = collection(userDocRef, 'despesas');
-        const q = query(expensesRef, where('data', '>=', `01${currentMonth}${currentYear}`), where('data', '<=', `31${currentMonth}${currentYear}`));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(expensesRef);
         let total = 0;
+  
         querySnapshot.forEach((doc) => {
           const expense = doc.data();
-          total += expense.valor;
+  
+          const data = expense.data;
+          const month = data.substr(2, 2);
+          const year = data.substr(4, 4);
+          console.log(month)
+          if (month == currentMonth && year == currentYear) {
+            total += expense.valor;
+          }
         });
+  
         setTotalDespesas(total);
       } catch (error) {
         console.log(error);
       }
     };
-
+  
     fetchTotalDespesas();
-  }, [user]);
+  }, [user, selectedDate]);
 
   useEffect(() => {
     const fetchTotalReceitas = async () => {
@@ -78,28 +85,38 @@ export default function HomeScreen() {
         if (!user) {
           return;
         }
-
-        const currentDate = new Date();
+  
+        const currentDate = new Date(selectedDate);
         const currentMonth = (currentDate.getMonth() + 1).toString().padStart(2, '0');
         const currentYear = currentDate.getFullYear();
-
         const userDocRef = doc(db, 'user', user.uid);
         const revenuesRef = collection(userDocRef, 'receitas');
-        const q = query(revenuesRef, where('data', '>=', `01${currentMonth}${currentYear}`), where('data', '<=', `31${currentMonth}${currentYear}`));
-        const querySnapshot = await getDocs(q);
+        const querySnapshot = await getDocs(revenuesRef);
+        
         let total = 0;
+        
+
         querySnapshot.forEach((doc) => {
           const revenue = doc.data();
-          total += revenue.valor;
+
+          const data = revenue.data;
+          const month = data.substr(2, 2);
+          const year = data.substr(4, 4);
+        
+          if (month == currentMonth && year == currentYear) {
+            total += revenue.valor;
+          }
         });
+  
         setTotalReceitas(total);
       } catch (error) {
         console.log(error);
       }
     };
-
+  
     fetchTotalReceitas();
-  }, [user]);
+  }, [user, selectedDate]);
+  
 
   useEffect(() => {
     const calcularLucro = () => {
@@ -153,8 +170,6 @@ export default function HomeScreen() {
           <MonthPicker
             onChange={(event, newDate) => handleDateConfirm(newDate)}
             value={selectedDate}
-            minimumDate={new Date(2000, 0)}
-            maximumDate={new Date()}
             locale="pt"
           />
         )}

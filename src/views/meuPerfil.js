@@ -6,7 +6,6 @@ import { doc, collection, query, getDocs, setDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import Alert from 'react-native-alert';
 
 function PerfilScreen() {
   const navigation = useNavigation();
@@ -49,12 +48,12 @@ function PerfilScreen() {
   async function handleSave() {
     try {
       if (!editableUser.nome || !editableUser.email) {
-        Alert('Por favor, preencha todos os campos obrigatórios.');
+        console.log('Por favor, preencha todos os campos obrigatórios.');
         return;
       }
 
       if (editableUser.senha !== editableUser.confirmarSenha) {
-        Alert('A senha e a confirmação da senha não coincidem.');
+        console.log('A senha e a confirmação da senha não coincidem.');
         return;
       }
 
