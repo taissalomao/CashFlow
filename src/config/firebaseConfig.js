@@ -1,3 +1,4 @@
+
 /* eslint-disable prettier/prettier */
 import { initializeApp } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
@@ -24,3 +25,4 @@ export const db = getFirestore(app);
 export const authFirebase = getAuth(app);
 export const storage = getStorage(app);
 export const database = getDatabase(app);
+
