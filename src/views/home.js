@@ -5,7 +5,7 @@ import { useNavigation } from '@react-navigation/native';
 import { collection, query, getDocs, doc, where } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useAuthentication } from '../utils/authenticator';
-import { Button } from 'native-base';
+import { Button, Avatar } from 'native-base';
 
 export default function HomeScreen() {
   const [totalDespesas, setTotalDespesas] = useState(0);
@@ -45,11 +45,11 @@ export default function HomeScreen() {
         if (!user) {
           return;
         }
-  
+
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth() + 1;
         const currentYear = currentDate.getFullYear();
-  
+
         const userDocRef = doc(db, 'user', user.uid);
         const expensesRef = collection(userDocRef, 'despesas');
         const q = query(expensesRef, where('data', '>=', `01${currentMonth}${currentYear}`), where('data', '<=', `${currentMonth}31${currentYear}`));
@@ -64,21 +64,21 @@ export default function HomeScreen() {
         console.log(error);
       }
     };
-  
+
     fetchTotalDespesas();
   }, [user]);
-  
+
   useEffect(() => {
     const fetchTotalReceitas = async () => {
       try {
         if (!user) {
           return;
         }
-  
+
         const currentDate = new Date();
         const currentMonth = currentDate.getMonth() + 1;
         const currentYear = currentDate.getFullYear();
-  
+
         const userDocRef = doc(db, 'user', user.uid);
         const revenuesRef = collection(userDocRef, 'receitas');
         const q = query(revenuesRef, where('data', '>=', `01${currentMonth}${currentYear}`), where('data', '<=', `31${currentMonth}${currentYear}`));
@@ -93,7 +93,7 @@ export default function HomeScreen() {
         console.log(error);
       }
     };
-  
+
     fetchTotalReceitas();
   }, [user]);
 
@@ -105,7 +105,11 @@ export default function HomeScreen() {
     <View style={styles.container}>
       <View style={styles.topSection}>
         <Text style={styles.welcome}>Bem-vindo, {userName}!</Text>
-        <Button style={styles.avatarButton} onPress={navigateToProfile} />
+        <Button style={styles.avatarButton} onPress={navigateToProfile}>
+          <Avatar size="sm" bg="blue.500" color="white">
+            {userName.charAt(0).toUpperCase()}
+          </Avatar>
+        </Button>
       </View>
 
       <View style={styles.sectionContainer}>
@@ -150,13 +154,13 @@ export default function HomeScreen() {
   );
 }
 
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#e8e9eb',
     justifyContent: 'center',
     alignItems: 'center',
+    paddingTop: 10, // Altere para o valor desejado
   },
   topSection: {
     flexDirection: 'row',
@@ -166,6 +170,9 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingTop: 30,
     paddingBottom: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   welcome: {
     color: '#fff',
@@ -203,9 +210,9 @@ const styles = StyleSheet.create({
   },
   secondaryButton: {
     backgroundColor: '#79d6f7',
+    width: '90%',
     borderRadius: 16,
     height: 52,
-    paddingHorizontal: 20,
     justifyContent: 'center',
     alignItems: 'center',
     marginTop: 20,

@@ -159,12 +159,16 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   header: {
-    backgroundColor: '#694fad',
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 5,
-    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#1348cf',
     width: '100%',
+    paddingTop: 30,
+    paddingBottom: 20,
+    position: 'absolute',
+    top: 0,
+    left: 0,
   },
   headerText: {
     fontWeight: 'bold',
@@ -201,10 +205,11 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
   },
   button: {
-    backgroundColor: '#694fad',
+    backgroundColor: '#1348cf',
+    width: '50%',
     paddingVertical: 12,
     paddingHorizontal: 35,
-    borderRadius: 5,
+    borderRadius: 8,
   },
 });
 
