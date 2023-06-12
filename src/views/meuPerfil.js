@@ -2,25 +2,28 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Button, Input, Text, NativeBaseProvider } from 'native-base';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { doc, setDoc, getDoc } from 'firebase/firestore';
 import { db } from '../config/firebaseConfig';
 import { useNavigation } from '@react-navigation/native';
+import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth'; // Importar createUserWithEmailAndPassword
 
 function PerfilScreen() {
   const navigation = useNavigation();
   const [user, setUser] = useState({ nome: '', email: '', senha: '' });
-  const auth = getAuth();
+  const auth = getAuth(); // Obter a instância de autenticação
 
   useEffect(() => {
     async function fetchUserData() {
       try {
-        const { uid } = auth.currentUser;
-        const usersRef = doc(db, 'users', uid);
-        const userSnapshot = await getDoc(usersRef);
-        if (userSnapshot.exists()) {
-          const userData = userSnapshot.data();
-          setUser(userData);
+        const currentUser = auth.currentUser;
+        if (currentUser) {
+          const { uid } = currentUser;
+          const usersRef = doc(db, 'user', uid);
+          const userSnapshot = await getDoc(usersRef);
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.data();
+            setUser(userData);
+          }
         }
       } catch (error) {
         console.log(error);
@@ -36,8 +39,13 @@ function PerfilScreen() {
       const authUser = await createUserWithEmailAndPassword(auth, email, senha);
 
       const { uid } = authUser.user;
-      const usersRef = doc(db, 'users', uid);
+      const usersRef = doc(db, 'user', uid);
       await setDoc(usersRef, user);
+      
+      // Crie um novo objeto com os valores atualizados
+      const updatedUser = { ...user };
+      setUser(updatedUser);
+      
       navigation.navigate('Home');
     } catch (error) {
       console.log(error);
